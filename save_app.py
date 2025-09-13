@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify, send_from_directory, render_template
 import os, json, tempfile
+import asyncio
 import requests
+from ocr import extract_text, parse_patta, translate_fields_async
+
 
 app = Flask(__name__)
 
@@ -160,6 +163,21 @@ def geocode():
     except Exception as e:
         return json_response({"success": False, "message": str(e)}, 500)
 
+
+@app.route("/extract_patta", methods=["POST"])
+def extract_patta_endpoint():
+    state_key = request.form.get("stateKey")
+    file = request.files.get("pattaFile")
+    if not file or not state_key:
+        return jsonify({"error": "Missing file or state"}), 400
+    
+    text = extract_text(file)
+    data = parse_patta(text, state_key)
+    data = asyncio.run(translate_fields_async(data))
+
+    data["state"] = state_key
+    return jsonify(data)
+
 @app.route('/get_app_status', methods=['POST'])
 def get_app_status():
     data = request.get_json(force=True)
@@ -191,8 +209,6 @@ def get_app_status():
             continue
     return json_response({'success': True, 'status': 'Pending'})
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
