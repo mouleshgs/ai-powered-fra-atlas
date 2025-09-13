@@ -1,0 +1,1843 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2025-09-13T09:13:59Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/5933952",
+        "landuse": "forest",
+        "type": "multipolygon",
+        "@geometry": "center",
+        "applications": [
+          {
+            "id": "app-tl-1",
+            "applicant": "Moulesh",
+            "tribal_note": "Claiming area near here",
+            "status": "approved",
+            "created_at": "2025-09-13T10:00:00Z",
+            "admin_note": "gdh",
+            "updated_at": "2025-09-13T13:48:02.285Z"
+          }
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.0213559,
+          17.3678545
+        ]
+      },
+      "id": "relation/5933952"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/12490378",
+        "boundary": "national_park",
+        "landuse": "forest",
+        "name": "Mrugavani National Park",
+        "natural": "scrub",
+        "protect_class": "2",
+        "type": "multipolygon",
+        "wikidata": "Q3092307",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.3392596,
+          17.3589798
+        ]
+      },
+      "id": "relation/12490378"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "relation/13810186",
+        "landuse": "forest",
+        "natural": "scrub",
+        "type": "multipolygon",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.4200977,
+          17.420234
+        ]
+      },
+      "id": "relation/13810186"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/148490236",
+        "landuse": "forest",
+        "natural": "scrub",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6299392,
+          17.3703303
+        ]
+      },
+      "id": "way/148490236"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/177760375",
+        "landuse": "forest",
+        "leaf_type": "mixed",
+        "name": "Ananthagiri Hills",
+        "wikidata": "Q4751479",
+        "wikipedia": "en:Ananthagiri Hills",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.8629237,
+          17.3233174
+        ]
+      },
+      "id": "way/177760375"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/198024795",
+        "landuse": "forest",
+        "name": "Kurnool City Forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.1441552,
+          15.8280935
+        ]
+      },
+      "id": "way/198024795"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/256667388",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.5289897,
+          17.3923148
+        ]
+      },
+      "id": "way/256667388"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/274970130",
+        "landuse": "forest",
+        "name": "Shamirpet Deer Park",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.5611119,
+          17.6003077
+        ]
+      },
+      "id": "way/274970130"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/280202372",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.6549684,
+          17.961602
+        ]
+      },
+      "id": "way/280202372"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/288869028",
+        "landuse": "forest",
+        "name": "HMDA Urban Forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.4848183,
+          17.4954018
+        ]
+      },
+      "id": "way/288869028"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/342060900",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.3743451,
+          17.4604448
+        ]
+      },
+      "id": "way/342060900"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/343928296",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.0535862,
+          17.7913527
+        ]
+      },
+      "id": "way/343928296"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/343928341",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.0392043,
+          17.7856061
+        ]
+      },
+      "id": "way/343928341"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/344885817",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6006814,
+          17.6949744
+        ]
+      },
+      "id": "way/344885817"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/344885818",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6035409,
+          17.6978339
+        ]
+      },
+      "id": "way/344885818"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/362955632",
+        "landuse": "forest",
+        "name": "Chilka Nagar Scrub Forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.5601671,
+          17.4178012
+        ]
+      },
+      "id": "way/362955632"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/374395226",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.4734567,
+          17.7781789
+        ]
+      },
+      "id": "way/374395226"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/374402539",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.4684412,
+          17.7387941
+        ]
+      },
+      "id": "way/374402539"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/374402546",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.5013277,
+          17.740986
+        ]
+      },
+      "id": "way/374402546"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/374402548",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.4733799,
+          17.7466674
+        ]
+      },
+      "id": "way/374402548"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/374402702",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.7045529,
+          17.7044021
+        ]
+      },
+      "id": "way/374402702"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/374402707",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.703385,
+          17.7025981
+        ]
+      },
+      "id": "way/374402707"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/374403113",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.6217185,
+          17.777208
+        ]
+      },
+      "id": "way/374403113"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/374403115",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.622751,
+          17.7769727
+        ]
+      },
+      "id": "way/374403115"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/395224109",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.0291012,
+          17.3834062
+        ]
+      },
+      "id": "way/395224109"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/395224111",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.0304071,
+          17.3850817
+        ]
+      },
+      "id": "way/395224111"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/432527410",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.2598398,
+          17.5434973
+        ]
+      },
+      "id": "way/432527410"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/433554638",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.0388766,
+          17.479909
+        ]
+      },
+      "id": "way/433554638"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/434801725",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.5574147,
+          17.6400116
+        ]
+      },
+      "id": "way/434801725"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/435588880",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.4511874,
+          17.3396337
+        ]
+      },
+      "id": "way/435588880"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/435595503",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.367474,
+          17.2230454
+        ]
+      },
+      "id": "way/435595503"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/435595506",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.3934697,
+          17.0755539
+        ]
+      },
+      "id": "way/435595506"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/435595508",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.3625126,
+          17.1972368
+        ]
+      },
+      "id": "way/435595508"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/438247703",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.5948758,
+          16.9387874
+        ]
+      },
+      "id": "way/438247703"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/438249251",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.7354893,
+          16.8524477
+        ]
+      },
+      "id": "way/438249251"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/438249255",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.7360791,
+          16.8584547
+        ]
+      },
+      "id": "way/438249255"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/438249257",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.7341,
+          16.8543421
+        ]
+      },
+      "id": "way/438249257"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/438251738",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.8399212,
+          16.8841616
+        ]
+      },
+      "id": "way/438251738"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/438254218",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.8638721,
+          16.9458098
+        ]
+      },
+      "id": "way/438254218"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/438254219",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.8660737,
+          16.9428878
+        ]
+      },
+      "id": "way/438254219"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/439600810",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.0194735,
+          17.2983979
+        ]
+      },
+      "id": "way/439600810"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/468813919",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.0935027,
+          18.2065302
+        ]
+      },
+      "id": "way/468813919"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/468823594",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.1016824,
+          18.207841
+        ]
+      },
+      "id": "way/468823594"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/503271949",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.4910534,
+          17.5903628
+        ]
+      },
+      "id": "way/503271949"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/503271950",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.4884241,
+          17.5913487
+        ]
+      },
+      "id": "way/503271950"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/503271951",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.4864568,
+          17.5898196
+        ]
+      },
+      "id": "way/503271951"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/548570103",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.2957434,
+          18.0747262
+        ]
+      },
+      "id": "way/548570103"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/616267614",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.5706531,
+          17.8007518
+        ]
+      },
+      "id": "way/616267614"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/636164774",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.2226235,
+          17.2177576
+        ]
+      },
+      "id": "way/636164774"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/675328364",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.3136526,
+          17.2254991
+        ]
+      },
+      "id": "way/675328364"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/680558244",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.7671632,
+          18.0545719
+        ]
+      },
+      "id": "way/680558244"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/740697717",
+        "landuse": "forest",
+        "leisure": "park",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.3586952,
+          17.4600528
+        ]
+      },
+      "id": "way/740697717"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/740754228",
+        "landuse": "forest",
+        "name": "ground",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.3878387,
+          18.6093975
+        ]
+      },
+      "id": "way/740754228"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/768408332",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.6306853,
+          17.536426
+        ]
+      },
+      "id": "way/768408332"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/769170081",
+        "landuse": "forest",
+        "leaf_cycle": "evergreen",
+        "leaf_type": "broadleaved",
+        "name": "orange trees",
+        "produce": "crop",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.9805732,
+          16.7220186
+        ]
+      },
+      "id": "way/769170081"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/772164441",
+        "landuse": "forest",
+        "source": "Bing (2020-02-13)",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.3032088,
+          17.2806224
+        ]
+      },
+      "id": "way/772164441"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/772164442",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.3051225,
+          17.2809999
+        ]
+      },
+      "id": "way/772164442"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/793403082",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6595954,
+          17.6661322
+        ]
+      },
+      "id": "way/793403082"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/793403083",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6628018,
+          17.6559872
+        ]
+      },
+      "id": "way/793403083"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/794583138",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6585017,
+          17.6917678
+        ]
+      },
+      "id": "way/794583138"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/799062341",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.8674324,
+          18.1483802
+        ]
+      },
+      "id": "way/799062341"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/846806441",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.36103,
+          17.4572236
+        ]
+      },
+      "id": "way/846806441"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/854030081",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6103575,
+          17.5078426
+        ]
+      },
+      "id": "way/854030081"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/866523006",
+        "landuse": "forest",
+        "name": "Manjeera Crocodile Pond",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.0720515,
+          17.65123
+        ]
+      },
+      "id": "way/866523006"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/866523649",
+        "landuse": "forest",
+        "name": "Manjeera Wildlife Sanctuary",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.0737505,
+          17.6518219
+        ]
+      },
+      "id": "way/866523649"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/868221648",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.3502436,
+          17.4305735
+        ]
+      },
+      "id": "way/868221648"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/868221649",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.3529794,
+          17.4274899
+        ]
+      },
+      "id": "way/868221649"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/868221650",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.3552318,
+          17.4298858
+        ]
+      },
+      "id": "way/868221650"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/868221652",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.3583278,
+          17.4322036
+        ]
+      },
+      "id": "way/868221652"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/868221653",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.3573059,
+          17.4283036
+        ]
+      },
+      "id": "way/868221653"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/868222005",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.3550474,
+          17.4217055
+        ]
+      },
+      "id": "way/868222005"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/958249352",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.7283625,
+          18.5573128
+        ]
+      },
+      "id": "way/958249352"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1082823044",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.4470063,
+          17.5053866
+        ]
+      },
+      "id": "way/1082823044"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1113285035",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6829944,
+          17.845565
+        ]
+      },
+      "id": "way/1113285035"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1122007197",
+        "landuse": "forest",
+        "name": "Govt Forest Land",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.2787582,
+          18.0743777
+        ]
+      },
+      "id": "way/1122007197"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1131140101",
+        "landuse": "forest",
+        "name": "Rainforest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.2192062,
+          17.1839431
+        ]
+      },
+      "id": "way/1131140101"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1132140494",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.2185996,
+          17.1802718
+        ]
+      },
+      "id": "way/1132140494"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1132140505",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.218553,
+          17.1826263
+        ]
+      },
+      "id": "way/1132140505"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1132140506",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.2178493,
+          17.1831933
+        ]
+      },
+      "id": "way/1132140506"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1132140507",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.2178426,
+          17.1825744
+        ]
+      },
+      "id": "way/1132140507"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1132140508",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.2180579,
+          17.1812099
+        ]
+      },
+      "id": "way/1132140508"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1132140509",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.2183844,
+          17.1813013
+        ]
+      },
+      "id": "way/1132140509"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1167459146",
+        "landuse": "forest",
+        "source": "Maxar Premium",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.1725297,
+          17.3537597
+        ]
+      },
+      "id": "way/1167459146"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1167459147",
+        "landuse": "forest",
+        "source": "Maxar Premium",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.1749966,
+          17.352232
+        ]
+      },
+      "id": "way/1167459147"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1173384712",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.3500192,
+          17.4469815
+        ]
+      },
+      "id": "way/1173384712"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1233783379",
+        "landuse": "forest",
+        "name": "Kandlakoya Reserved Forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.5034896,
+          17.6087264
+        ]
+      },
+      "id": "way/1233783379"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1233785144",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.4957898,
+          17.6012914
+        ]
+      },
+      "id": "way/1233785144"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1244795696",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6016721,
+          17.2379013
+        ]
+      },
+      "id": "way/1244795696"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1273549926",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.8481441,
+          16.8650673
+        ]
+      },
+      "id": "way/1273549926"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1273549927",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.848553,
+          16.8648313
+        ]
+      },
+      "id": "way/1273549927"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1273848827",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.9813171,
+          17.2239211
+        ]
+      },
+      "id": "way/1273848827"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1292357496",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.3595429,
+          17.1905219
+        ]
+      },
+      "id": "way/1292357496"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1328043838",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          81.053854,
+          17.7768591
+        ]
+      },
+      "id": "way/1328043838"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1328043845",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.9767441,
+          17.7865619
+        ]
+      },
+      "id": "way/1328043845"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1328043847",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.9602374,
+          17.8019684
+        ]
+      },
+      "id": "way/1328043847"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1328043848",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.9726458,
+          17.8854088
+        ]
+      },
+      "id": "way/1328043848"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1328043849",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.8569761,
+          18.1530323
+        ]
+      },
+      "id": "way/1328043849"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1328043851",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.8431154,
+          18.0996786
+        ]
+      },
+      "id": "way/1328043851"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1340683701",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          79.7457508,
+          17.1497767
+        ]
+      },
+      "id": "way/1340683701"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1425201447",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.7115444,
+          18.506043
+        ]
+      },
+      "id": "way/1425201447"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1425201469",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.7022024,
+          18.502367
+        ]
+      },
+      "id": "way/1425201469"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1425201478",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6995322,
+          18.4996289
+        ]
+      },
+      "id": "way/1425201478"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1425203718",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.7094787,
+          18.5157242
+        ]
+      },
+      "id": "way/1425203718"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1425347415",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6917915,
+          18.4991683
+        ]
+      },
+      "id": "way/1425347415"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1427806208",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6518747,
+          18.5219327
+        ]
+      },
+      "id": "way/1427806208"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1428104134",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6893884,
+          18.4698056
+        ]
+      },
+      "id": "way/1428104134"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1428104135",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6892861,
+          18.4692206
+        ]
+      },
+      "id": "way/1428104135"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1428104149",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6866284,
+          18.4668731
+        ]
+      },
+      "id": "way/1428104149"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1428104158",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6888038,
+          18.4696621
+        ]
+      },
+      "id": "way/1428104158"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1428114023",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6822513,
+          18.4639728
+        ]
+      },
+      "id": "way/1428114023"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1428114070",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6797081,
+          18.4610596
+        ]
+      },
+      "id": "way/1428114070"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1428128633",
+        "landuse": "forest",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          78.6414138,
+          18.5383964
+        ]
+      },
+      "id": "way/1428128633"
+    }
+  ]
+}

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FRA Forest Viewer</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map { height: 88vh; width: 100%; }
+    #controls { margin: 8px; display:flex; gap:12px; align-items:center; }
+    #info { font-size:13px; color:#333; }
+
+    /* new: application marker and popup styles */
+    .app-icon { display:block; line-height:0; }
+    .leaflet-marker-icon.app-icon { transform: translateY(-6px); } /* slight lift */
+
+    .app-popup { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; width:320px; }
+    .app-popup .title { font-weight:700; font-size:14px; margin-bottom:6px; }
+    .app-popup .badge { display:inline-block; padding:4px 8px; border-radius:12px; color:#fff; font-size:12px; margin-left:8px; vertical-align:middle; }
+    .app-popup .tribal-note { background:#f7f7f7; padding:8px; border-radius:6px; margin-top:6px; font-size:13px; color:#222; }
+    .app-popup textarea { width:100%; box-sizing:border-box; height:72px; padding:8px; border-radius:6px; border:1px solid #ddd; font-family:inherit; font-size:13px; resize:vertical; }
+    .app-popup .buttons { display:flex; gap:8px; margin-top:8px; }
+    .app-popup button { flex:1; padding:8px 10px; border-radius:6px; border:0; color:#fff; cursor:pointer; font-weight:600; }
+    .app-popup .btn-approve { background:#2b8c2b; }
+    .app-popup .btn-reject { background:#d9534f; }
+    .app-popup .meta { margin-top:8px; font-size:12px; color:#666; }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <label for="stateSelect">Select State: </label>
+    <select id="stateSelect">
+      <option value="">--Choose--</option>
+      <option value="mp">Madhya Pradesh</option>
+      <option value="odisha">Odisha</option>
+      <option value="tripura">Tripura</option>
+      <option value="telangana">Telangana</option>
+    </select>
+    <div id="info">Choose a state — valid points will be shown. Tripura has some invalid features (empty coordinates) which are ignored.</div>
+  </div>
+
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([22.0, 82.0], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'© OpenStreetMap', maxZoom: 18 }).addTo(map);
+
+    const files = {
+      "mp": "/static/geojson/mp.geojson",
+      "odisha": "/static/geojson/odisha.geojson",
+      "tripura": "/static/geojson/tripura.geojson",
+      "telangana": "/static/geojson/telangana.geojson"
+    };
+
+    let currentLayer = null;
+    let combinedLayer = null;
+    const perStateData = {}; // store FeatureCollections per state
+    const infoEl = document.getElementById('info');
+    const stateSelect = document.getElementById('stateSelect');
+
+    function isValidCoordinateArray(coords){
+      // coords expected [lon,lat] for Points
+      return Array.isArray(coords) && coords.length>=2 &&
+             typeof coords[0] === 'number' && typeof coords[1] === 'number' &&
+             !Number.isNaN(coords[0]) && !Number.isNaN(coords[1]);
+    }
+
+    function validFeature(feature){
+      if(!feature || !feature.geometry) return false;
+      const g = feature.geometry;
+      if(g.type === 'Point'){
+        return isValidCoordinateArray(g.coordinates);
+      }
+      // For other geometry types, ensure coordinates exist and not empty (basic check)
+      if(g.type === 'Polygon' || g.type === 'MultiPolygon' || g.type === 'LineString' || g.type === 'MultiLineString'){
+        return Array.isArray(g.coordinates) && g.coordinates.length>0;
+      }
+      return false;
+    }
+
+    function renderGeoJSON(data){
+      if(currentLayer){
+        map.removeLayer(currentLayer);
+        currentLayer = null;
+      }
+      if(combinedLayer){
+        map.removeLayer(combinedLayer);
+        combinedLayer = null;
+      }
+      const features = (data && data.features) ? data.features.filter(validFeature) : [];
+      infoEl.textContent = `Showing ${features.length} valid feature(s).`;
+
+      if(features.length === 0){
+        // nothing valid to show
+        map.setView([22.0, 82.0], 5);
+        return;
+      }
+
+      const fc = { type: "FeatureCollection", features: features };
+
+      currentLayer = L.geoJSON(fc, {
+        pointToLayer: function(feature, latlng){
+          return L.circleMarker(latlng, { radius:4, color:'#145214', fillColor:'#2b8c2b', fillOpacity:1 });
+        },
+        style: function(feature){
+          return { color:'#2b8c2b', weight:1, fillOpacity:0.35 };
+        },
+        onEachFeature: function(feature, layer){
+          // show some useful popup info if present
+          const props = feature.properties || {};
+          let title = props.name || props.NOMENKLATUR || props['@id'] || 'Forest';
+          layer.bindPopup(title);
+        }
+      }).addTo(map);
+
+      // fit to bounds of the added layer; fallback center if getBounds fails
+      try {
+        map.fitBounds(currentLayer.getBounds(), { padding: [10,10] });
+      } catch(e){
+        map.setView([22.0,82.0], 6);
+      }
+    }
+
+    async function loadAllStatesAndShowCombined(){
+      infoEl.textContent = 'Loading all states...';
+      try{
+        const promises = Object.entries(files).map(([k,f]) => fetch(f).then(r=>{
+          if(!r.ok) throw new Error(`Failed ${f}: ${r.status}`);
+          return r.json();
+        }).catch(err => {
+          console.warn('Fetch failed for', f, err);
+          return { type:'FeatureCollection', features: [] };
+        }));
+        const results = await Promise.all(promises);
+        // store per-state filtered data
+        let combinedFeatures = [];
+        let i = 0;
+        for(const key of Object.keys(files)){
+          const data = results[i++] || { features: [] };
+          const valid = (data.features||[]).filter(validFeature);
+          perStateData[key] = { type: 'FeatureCollection', features: valid };
+          combinedFeatures = combinedFeatures.concat(valid);
+        }
+        // show combined on first load
+        combinedLayer = L.geoJSON({ type:'FeatureCollection', features: combinedFeatures }, {
+          pointToLayer: function(feature, latlng){
+            return L.circleMarker(latlng, { radius:3, color:'#145214', fillColor:'#2b8c2b', fillOpacity:0.9 });
+          },
+          style: function(){ return { color:'#2b8c2b', weight:1, fillOpacity:0.25 }; },
+          onEachFeature: function(feature, layer){
+            const props = feature.properties || {};
+            let title = props.name || props['@id'] || 'Forest';
+            layer.bindPopup(title);
+          }
+        }).addTo(map);
+
+        infoEl.textContent = `Showing all states: ${combinedFeatures.length} valid feature(s).`;
+        try { map.fitBounds(combinedLayer.getBounds(), { padding:[10,10] }); } catch(e){ map.setView([22.0,82.0],5); }
+      } catch(err){
+        console.error(err);
+        infoEl.textContent = 'Error loading state files: ' + err.message;
+      }
+    }
+
+    // New: show combined view (used when dropdown cleared)
+    function showCombined(){
+      if(currentLayer){ map.removeLayer(currentLayer); currentLayer = null; }
+      if(combinedLayer){
+        combinedLayer.addTo(map);
+        try { map.fitBounds(combinedLayer.getBounds(), { padding:[10,10] }); } catch(e){ map.setView([22.0,82.0],5); }
+        infoEl.textContent = `Showing all states: ${combinedLayer.toGeoJSON().features.length} valid feature(s).`;
+      } else {
+        loadAllStatesAndShowCombined();
+      }
+    }
+
+    // Modified loadStateGeo to use cached perStateData
+    function loadStateGeo(stateKey){
+      if(!stateKey){
+        showCombined();
+        return;
+      }
+      const data = perStateData[stateKey];
+      if(!data){
+        // if not loaded yet, fetch single file as fallback
+        (async ()=> {
+          infoEl.textContent = `Loading ${files[stateKey]} ...`;
+          try{
+            const res = await fetch(files[stateKey]);
+            if(!res.ok) throw new Error(`Failed to fetch ${files[stateKey]}: ${res.status}`);
+            const d = await res.json();
+            perStateData[stateKey] = { type:'FeatureCollection', features: (d.features||[]).filter(validFeature) };
+            renderGeoJSON(perStateData[stateKey]);
+          } catch(err){
+            console.error(err);
+            infoEl.textContent = `Error loading ${files[stateKey]}: ${err.message}`;
+          }
+        })();
+        return;
+      }
+      renderGeoJSON(data);
+    }
+
+    // wire dropdown
+    stateSelect.addEventListener('change', function(){
+      if(this.value) loadStateGeo(this.value);
+      else showCombined();
+    });
+
+    // initial load: fetch and show combined view
+    loadAllStatesAndShowCombined();
+
+    // ---------- Applications drawn from feature.properties.applications ----------
+    // No localStorage; read application entries directly from perStateData features.
+    const appsLayerGroup = L.layerGroup().addTo(map);
+    let appsVisible = true;
+
+    // Toggle control (reuses existing UI approach)
+    const appsToggle = L.control({ position: 'topleft' });
+    appsToggle.onAdd = function () {
+      const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+      div.style.background = '#fff';
+      div.style.padding = '6px';
+      div.style.cursor = 'pointer';
+      div.title = 'Toggle application markers';
+      div.innerHTML = 'Apps';
+      div.onclick = () => {
+        appsVisible = !appsVisible;
+        if (appsVisible) {
+          appsLayerGroup.addTo(map);
+          div.style.background = '#e6ffe6';
+        } else {
+          map.removeLayer(appsLayerGroup);
+          div.style.background = '#fff';
+        }
+      };
+      return div;
+    };
+    appsToggle.addTo(map);
+
+    function appColor(status){
+      if(status === 'pending') return '#ffd449';
+      if(status === 'approved') return '#2b8c2b';
+      if(status === 'rejected') return '#d9534f';
+      return '#888';
+    }
+
+    function escapeHtml(s){
+      if(!s) return '';
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    // Collect apps with context so we can persist changes back to the file
+    function collectAppsFromFeatures(){
+      const apps = [];
+      Object.keys(perStateData).forEach(stateKey => {
+        const fc = perStateData[stateKey];
+        if(!fc || !Array.isArray(fc.features)) return;
+        fc.features.forEach(feat => {
+          const aList = (feat.properties && Array.isArray(feat.properties.applications)) ? feat.properties.applications : [];
+          aList.forEach(a => {
+            apps.push(Object.assign({}, a, {
+              stateKey: stateKey,
+              featureId: feat.id || null,
+              coords: (feat.geometry && Array.isArray(feat.geometry.coordinates)) ? feat.geometry.coordinates : null,
+              _featureRef: feat
+            }));
+          });
+        });
+      });
+      return apps;
+    }
+
+    // Create a custom SVG DivIcon for a map-pin style marker
+    function createAppIcon(status){
+      const color = appColor(status || 'pending');
+      const svg = `
+        <svg width="36" height="48" viewBox="0 0 24 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 0C7 0 3 4 3 9c0 7.5 9 23 9 23s9-15.5 9-23c0-5-4-9-9-9z" fill="${color}" stroke="#222" stroke-width="0.8"/>
+          <circle cx="12" cy="9" r="3.2" fill="#fff" opacity="0.95"/>
+        </svg>
+      `;
+      return L.divIcon({
+        className: 'app-icon',
+        html: svg,
+        iconSize: [36,48],
+        iconAnchor: [18,44],
+        popupAnchor: [0,-44]
+      });
+    }
+
+    // Render markers for each application (map-pin icon) with improved popup UI
+    function renderApplicationsLayer(){
+      appsLayerGroup.clearLayers();
+      const apps = collectAppsFromFeatures();
+      apps.forEach(app => {
+        // prefer explicit coords on app else fallback to feature geometry
+        let coords = app.coords;
+        if(!Array.isArray(coords) && app._featureRef && app._featureRef.geometry){
+          coords = app._featureRef.geometry.coordinates;
+        }
+        if(!Array.isArray(coords) || coords.length < 2) return;
+        const latlng = [coords[1], coords[0]];
+
+        const marker = L.marker(latlng, {
+          icon: createAppIcon(app.status)
+        });
+
+        const statusText = escapeHtml(app.status || 'pending');
+        const badgeColor = appColor(app.status || 'pending');
+
+        const popupHtml = `
+          <div class="app-popup">
+            <div class="title">
+              ${escapeHtml(app.applicant || 'Applicant')}
+              <span class="badge" style="background:${badgeColor}">${statusText}</span>
+            </div>
+
+            <div><strong>Tribal note</strong></div>
+            <div class="tribal-note">${escapeHtml(app.tribal_note || '')}</div>
+
+            <div style="margin-top:8px"><strong>Admin note</strong></div>
+            <textarea id="admin_note_${app.id}" placeholder="Enter admin note...">${escapeHtml(app.admin_note || '')}</textarea>
+
+            <div class="buttons">
+              <button id="approve_${app.id}" class="btn-approve">Approve</button>
+              <button id="reject_${app.id}" class="btn-reject">Reject</button>
+            </div>
+
+            <div class="meta">App ID: ${escapeHtml(String(app.id || ''))} · Created: ${escapeHtml(String(app.created_at || '—'))}</div>
+          </div>
+        `;
+
+        marker.bindPopup(popupHtml, { minWidth: 320, maxWidth: 360 });
+
+        marker.on('popupopen', () => {
+          // wire buttons and textarea
+          setTimeout(() => {
+            const approveBtn = document.getElementById(`approve_${app.id}`);
+            const rejectBtn  = document.getElementById(`reject_${app.id}`);
+            const ta         = document.getElementById(`admin_note_${app.id}`);
+            if(ta) ta.value = app.admin_note || '';
+            if(approveBtn) approveBtn.onclick = () => {
+              const note = ta ? ta.value : '';
+              updateAppStatus(app.stateKey, app.featureId, app.id, 'approved', note);
+              marker.closePopup();
+            };
+            if(rejectBtn) rejectBtn.onclick = () => {
+              const note = ta ? ta.value : '';
+              updateAppStatus(app.stateKey, app.featureId, app.id, 'rejected', note);
+              marker.closePopup();
+            };
+          }, 20);
+        });
+
+        appsLayerGroup.addLayer(marker);
+      });
+
+      if(!appsVisible) map.removeLayer(appsLayerGroup);
+    }
+
+    // Persist change by POSTing to Python endpoint (use full origin to avoid 405 on wrong host)
+    function persistAppChange(stateKey, featureId, appId, updatedApp){
+      const url = 'http://localhost:5000/save_app'; // ensure Flask is running on this host:port
+      return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stateKey, featureId, appId, updatedApp })
+      }).then(async res => {
+        let json = null;
+        try { json = await res.json(); } catch(e){ /* no json */ }
+        if(!res.ok) {
+          const msg = (json && json.message) ? json.message : `HTTP ${res.status}`;
+          throw new Error(msg);
+        }
+        return json;
+      });
+    }
+
+    // Update application object inside the feature.properties.applications (in-memory) and persist
+    function updateAppStatus(stateKey, featureId, appId, newStatus, adminNote){
+      const fc = perStateData[stateKey];
+      if(!fc || !Array.isArray(fc.features)) {
+        alert('State data not loaded for ' + stateKey);
+        return;
+      }
+      const feat = fc.features.find(f => f.id === featureId);
+      if(!feat || !feat.properties) return;
+      const apps = Array.isArray(feat.properties.applications) ? feat.properties.applications : [];
+      const idx = apps.findIndex(a => a.id === appId);
+      if(idx === -1) return;
+      // update in-memory
+      apps[idx].status = newStatus;
+      apps[idx].admin_note = adminNote || '';
+      apps[idx].updated_at = new Date().toISOString();
+      feat.properties.applications = apps;
+      // re-render markers immediately
+      renderApplicationsLayer();
+
+      // send persistence request
+      persistAppChange(stateKey, featureId, appId, apps[idx])
+        .then(resp => {
+          if(resp && resp.success){
+            console.log('Saved to file:', resp.message || '');
+          } else {
+            console.error('Save failed', resp);
+            alert('Could not save change to file: ' + (resp && resp.message ? resp.message : 'unknown error'));
+          }
+        })
+        .catch(err => {
+          console.error('Persist error', err);
+          alert('Error saving change to disk: ' + (err && err.message ? err.message : err));
+        });
+    }
+
+    // Wait for perStateData to be populated by the initial loader, then render apps.
+    (function waitThenRenderApps(){
+      const t = setInterval(()=>{
+        if(Object.keys(perStateData).length > 0){
+          renderApplicationsLayer();
+          clearInterval(t);
+        }
+      }, 200);
+      // fallback after 5s
+      setTimeout(()=>{ renderApplicationsLayer(); clearInterval(t); }, 5000);
+    })();
+  </script>
+</body>
+</html>

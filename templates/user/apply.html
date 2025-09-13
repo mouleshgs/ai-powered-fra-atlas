@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Apply for Forest Access</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body{font-family:system-ui,Arial;margin:12px;color:#111}
+    .card{max-width:860px;margin:0 auto;padding:12px;border:1px solid #ddd;border-radius:8px;background:#fff}
+    label{display:block;margin-top:8px;font-weight:600}
+    input[type="text"],textarea,select{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:6px;box-sizing:border-box}
+    button{margin-top:12px;padding:10px 12px;border:0;border-radius:6px;background:#2b8c2b;color:#fff;font-weight:700;cursor:pointer}
+    #status{margin-top:12px;font-size:14px}
+    #map { height: 360px; margin-top:10px; border-radius:6px; }
+    .small { font-size:13px; color:#444; margin-top:6px; }
+    .btn-secondary { background:#f0ad4e; margin-left:8px; color:#fff; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Apply as Tribal Applicant</h2>
+
+    <div class="small">Enter name, village and state. You may geocode the village or pick a spot on the map (Choose different spot).</div>
+
+    <form id="applyForm">
+      <label>Name</label>
+      <input id="applicant" type="text" required placeholder="Your name" />
+
+      <label>Tribal note / Reason</label>
+      <textarea id="tribal_note" rows="3" placeholder="Explain why you are applying"></textarea>
+
+      <label>Village name</label>
+      <input id="village" type="text" placeholder="e.g. Bhojapura" />
+
+      <label>State</label>
+      <select id="stateKey" required>
+        <option value="">-- choose state --</option>
+        <option value="mp">Madhya Pradesh</option>
+        <option value="odisha">Odisha</option>
+        <option value="tripura">Tripura</option>
+        <option value="telangana">Telangana</option>
+      </select>
+
+      <div style="display:flex;gap:8px;align-items:center">
+        <button type="submit">Find & Apply</button>
+        <button id="chooseManual" type="button" class="btn-secondary">Choose different spot</button>
+        <div id="manualHint" class="small" style="margin-left:8px;color:#666"></div>
+      </div>
+    </form>
+
+    <div id="status" aria-live="polite"></div>
+
+    <div id="map" aria-hidden="false"></div>
+
+    <div id="result" style="display:none;margin-top:10px">
+      <h3>Matched Forest</h3>
+      <div id="matchInfo" class="small"></div>
+      <div style="margin-top:8px">
+        <button id="confirmBtn" style="background:#1f6feb">Confirm and Submit Application</button>
+        <button id="resetSelection" type="button" class="btn-secondary">Clear selection</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+  <script src="{{ url_for('static', filename='apply.js') }}"></script>
+</body>
+</html>
