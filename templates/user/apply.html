@@ -2,9 +2,12 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Apply for Forest Access</title>
+  <title>Apply for Forest Rights</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
     body{font-family:system-ui,Arial;margin:12px;color:#111}
     .card{max-width:860px;margin:0 auto;padding:12px;border:1px solid #ddd;border-radius:8px;background:#fff}
@@ -15,56 +18,233 @@
     #map { height: 360px; margin-top:10px; border-radius:6px; }
     .small { font-size:13px; color:#444; margin-top:6px; }
     .btn-secondary { background:#f0ad4e; margin-left:8px; color:#fff; }
+    .container { max-width: 860px; margin: 0 auto; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #fff; }
+    .error { color: red; margin-top: 10px; }
+    .success { color: green; margin-top: 10px; }
+    .profile-bar { position: absolute; top: 20px; right: 30px; display: flex; align-items: center; }
+    .profile-icon { width: 40px; height: 40px; border-radius: 50%; background: #388e3c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-right: 10px; }
+    .logout-btn { padding: 8px 16px; background: #d32f2f; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    #applicationCard { background:#e8f5e9; margin-top:24px; }
   </style>
 </head>
 <body>
+  <div class="profile-bar" id="profileBar" style="display:none;">
+    <div class="profile-icon" id="profileIcon" title="Profile"></div>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </div>
   <div class="card">
     <h2>Apply as Tribal Applicant</h2>
-
-    <div class="small">Enter name, village and state. You may geocode the village or pick a spot on the map (Choose different spot).</div>
-
-    <form id="applyForm">
-      <label>Name</label>
-      <input id="applicant" type="text" required placeholder="Your name" />
-
-      <label>Tribal note / Reason</label>
-      <textarea id="tribal_note" rows="3" placeholder="Explain why you are applying"></textarea>
-
-      <label>Village name</label>
-      <input id="village" type="text" placeholder="e.g. Bhojapura" />
-
-      <label>State</label>
-      <select id="stateKey" required>
-        <option value="">-- choose state --</option>
-        <option value="mp">Madhya Pradesh</option>
-        <option value="odisha">Odisha</option>
-        <option value="tripura">Tripura</option>
-        <option value="telangana">Telangana</option>
-      </select>
-
-      <div style="display:flex;gap:8px;align-items:center">
-        <button type="submit">Find & Apply</button>
-        <button id="chooseManual" type="button" class="btn-secondary">Choose different spot</button>
-        <div id="manualHint" class="small" style="margin-left:8px;color:#666"></div>
-      </div>
-    </form>
-
-    <div id="status" aria-live="polite"></div>
-
-    <div id="map" aria-hidden="false"></div>
-
-    <div id="result" style="display:none;margin-top:10px">
-      <h3>Matched Forest</h3>
-      <div id="matchInfo" class="small"></div>
-      <div style="margin-top:8px">
-        <button id="confirmBtn" style="background:#1f6feb">Confirm and Submit Application</button>
-        <button id="resetSelection" type="button" class="btn-secondary">Clear selection</button>
+    <div id="beforeApply">
+      <div class="small">Enter name, village and state. You may geocode the village or pick a spot on the map (Choose different spot).</div>
+      <form id="applyForm">
+        <label>Name</label>
+        <input id="applicant" type="text" required placeholder="Your name" />
+        <label>Tribal note / Reason</label>
+        <textarea id="tribal_note" rows="3" placeholder="Explain why you are applying"></textarea>
+        <label>Village name</label>
+        <input id="village" type="text" placeholder="e.g. Bhojapura" />
+        <label>State</label>
+        <select id="stateKey" required>
+          <option value="">-- choose state --</option>
+          <option value="mp">Madhya Pradesh</option>
+          <option value="odisha">Odisha</option>
+          <option value="tripura">Tripura</option>
+          <option value="telangana">Telangana</option>
+        </select>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button type="submit">Find & Apply</button>
+          <button id="chooseManual" type="button" class="btn-secondary">Choose different spot</button>
+          <div id="manualHint" class="small" style="margin-left:8px;color:#666"></div>
+        </div>
+      </form>
+      <div id="status" aria-live="polite"></div>
+      <div id="map" aria-hidden="false"></div>
+      <div id="result" style="display:none;margin-top:10px">
+        <h3>Matched Forest</h3>
+        <div id="matchInfo" class="small"></div>
+        <div style="margin-top:8px">
+          <button id="confirmBtn" style="background:#1f6feb">Confirm and Submit Application</button>
+          <button id="resetSelection" type="button" class="btn-secondary">Clear selection</button>
+        </div>
       </div>
     </div>
+    <div id="applicationCard" class="card" style="display:none;">
+      <h3>Your Application</h3>
+      <div><b>Name:</b> <span id="cardName"></span></div>
+      <div><b>Tribal Note:</b> <span id="cardNote"></span></div>
+      <div><b>Village:</b> <span id="cardVillage"></span></div>
+      <div><b>State:</b> <span id="cardState"></span></div>
+      <button id="trackProgressBtn" style="margin-top:18px;background:#1976d2;">Track Progress</button>
+      <div id="progressStatus" style="margin-top:12px;font-weight:bold;"></div>
+    </div>
+    <div id="success" class="success"></div>
+    <div id="error" class="error"></div>
   </div>
-
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
   <script src="{{ url_for('static', filename='apply.js') }}"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB8FWKokLgsgJ_uDDF1HSWh6brugLjK_9g",
+      authDomain: "sih-fra.firebaseapp.com",
+      projectId: "sih-fra",
+      storageBucket: "sih-fra.appspot.com",
+      messagingSenderId: "808806324009",
+      appId: "1:808806324009:web:5fd76cefa57b89c28c8938"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Profile and logout logic
+    const profileBar = document.getElementById('profileBar');
+    const profileIcon = document.getElementById('profileIcon');
+    const logoutBtn = document.getElementById('logoutBtn');
+    let currentUser = null;
+
+    auth.onAuthStateChanged(function(user) {
+      if (!user) {
+        window.location.href = "/";
+        return;
+      }
+      currentUser = user;
+      profileBar.style.display = 'flex';
+      profileIcon.textContent = user.email ? user.email[0].toUpperCase() : 'U';
+      profileIcon.title = user.email;
+      loadApplication();
+    });
+
+    logoutBtn.onclick = function() {
+      auth.signOut().then(() => {
+        window.location.href = "/";
+      });
+    };
+
+    // Application logic
+    const applyForm = document.getElementById('applyForm');
+    const errorDiv = document.getElementById('error');
+    const successDiv = document.getElementById('success');
+    const applicationCard = document.getElementById('applicationCard');
+    const beforeApply = document.getElementById('beforeApply');
+    let lastAppDocId = null;
+    let lastAppStatus = null;
+    let lastApplicant = null;
+
+    function loadApplication() {
+      db.collection('applications')
+        .where('userId', '==', currentUser.uid)
+        .limit(1)
+        .get()
+        .then(snapshot => {
+          if (!snapshot.empty) {
+            const doc = snapshot.docs[0];
+            const app = doc.data();
+            lastAppDocId = doc.id;
+            lastAppStatus = app.status || 'Pending';
+            lastApplicant = app.applicant || '';
+            showApplicationCard(app);
+            beforeApply.style.display = 'none';
+          } else {
+            applicationCard.style.display = 'none';
+            beforeApply.style.display = '';
+          }
+        });
+    }
+
+    function showApplicationCard(app) {
+      document.getElementById('cardName').textContent = app.applicant || '';
+      document.getElementById('cardNote').textContent = app.tribal_note || '';
+      document.getElementById('cardVillage').textContent = app.village || '';
+      document.getElementById('cardState').textContent = app.stateKey || '';
+      applicationCard.style.display = '';
+      updateProgressStatus(app.status || 'Pending');
+    }
+
+    function updateProgressStatus(status) {
+      const progressDiv = document.getElementById('progressStatus');
+      let color = '#f0ad4e'; // orange for pending
+      let text = status || 'Pending';
+      if (status === 'Approved') { color = '#388e3c'; }
+      else if (status === 'Rejected') { color = '#d32f2f'; }
+      progressDiv.textContent = text;
+      progressDiv.style.color = color;
+    }
+
+    document.getElementById('trackProgressBtn').onclick = function() {
+      // Fetch latest status from backend, send both userId and applicant name
+      fetch('/get_app_status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUser.uid, applicant: lastApplicant })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.status) {
+          updateProgressStatus(data.status);
+          // Also update in Firestore for consistency
+          if (lastAppDocId && data.status !== lastAppStatus) {
+            db.collection('applications').doc(lastAppDocId).update({ status: data.status });
+            lastAppStatus = data.status;
+          }
+        } else {
+          updateProgressStatus('Pending');
+        }
+      })
+      .catch(() => {
+        updateProgressStatus('Pending');
+      });
+    };
+
+    // Only handle the "Confirm and Submit Application" button for actual submission
+    document.addEventListener('DOMContentLoaded', function() {
+      const confirmBtn = document.getElementById('confirmBtn');
+      if (confirmBtn) {
+        confirmBtn.onclick = function(e) {
+          e.preventDefault();
+          errorDiv.textContent = '';
+          successDiv.textContent = '';
+          if (!currentUser) {
+            errorDiv.textContent = "Not logged in.";
+            return;
+          }
+          const applicant = document.getElementById('applicant').value.trim();
+          const tribal_note = document.getElementById('tribal_note').value.trim();
+          const village = document.getElementById('village').value.trim();
+          const stateKey = document.getElementById('stateKey').value;
+          if (!applicant || !stateKey) {
+            errorDiv.textContent = "Name and State are required.";
+            return;
+          }
+          // Check if already applied
+          db.collection('applications')
+            .where('userId', '==', currentUser.uid)
+            .limit(1)
+            .get()
+            .then(snapshot => {
+              if (!snapshot.empty) {
+                errorDiv.textContent = "You have already applied.";
+                loadApplication();
+                return;
+              }
+              // Save application
+              db.collection('applications').add({
+                userId: currentUser.uid,
+                applicant,
+                tribal_note,
+                village,
+                stateKey,
+                status: 'Pending',
+                submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+              }).then(() => {
+                successDiv.textContent = "Application submitted!";
+                loadApplication();
+              }).catch(() => {
+                errorDiv.textContent = "Failed to submit application.";
+              });
+            });
+        };
+      }
+    });
+  </script>
 </body>
 </html>

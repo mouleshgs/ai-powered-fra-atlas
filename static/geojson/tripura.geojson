@@ -9,18 +9,7 @@
       "properties": {
         "@id": "way/554636468",
         "landuse": "forest",
-        "@geometry": "center",
-        "applications": [
-          {
-            "id": "app-tr-1",
-            "applicant": "niiigg",
-            "tribal_note": "Claiming area near here",
-            "status": "rejected",
-            "created_at": "2025-09-13T10:00:00Z",
-            "admin_note": "",
-            "updated_at": "2025-09-13T13:40:28.458Z"
-          }
-        ]
+        "@geometry": "center"
       },
       "geometry": {
         "type": "Point",

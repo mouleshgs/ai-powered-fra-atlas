@@ -22,11 +22,20 @@ GEOJSON_DIR = os.path.join(app.root_path, "static", "geojson")
 
 @app.route('/')
 def home():
+    return render_template('forestuserslogin.html')
+
+@app.route('/user/apply')
+def user_apply():
     return render_template('user/apply.html')
 
 @app.route('/admin')
 def admin():
+    return render_template('auth/govt-login.html')
+
+@app.route('/admin/dashboard')
+def admin_dashboard():
     return render_template('index.html')
+
 
 def json_response(data, status=200):
     resp = jsonify(data)
@@ -140,6 +149,36 @@ def geocode():
         return jsonify(r.json())
     except Exception as e:
         return json_response({"success": False, "message": str(e)}, 500)
+
+@app.route('/get_app_status', methods=['POST'])
+def get_app_status():
+    data = request.get_json(force=True)
+    user_id = data.get('userId')
+    applicant = data.get('applicant')  # Pass applicant name from frontend for fallback
+    if not user_id and not applicant:
+        return json_response({'success': False, 'message': 'Missing userId/applicant'}, 400)
+
+    # Search all geojson files for this user's application
+    for state_key, filename in STATE_FILE_MAP.items():
+        file_path = os.path.join(GEOJSON_DIR, filename)
+        if not os.path.isfile(file_path):
+            continue
+        try:
+            with open(file_path, 'r', encoding='utf-8') as fh:
+                geo = json.load(fh)
+            features = geo.get('features', [])
+            for feat in features:
+                props = feat.get('properties', {})
+                apps = props.get('applications', [])
+                for app in apps:
+                    # Prefer userId match, fallback to applicant name (case-insensitive)
+                    if (user_id and str(app.get('userId')) == str(user_id)) or \
+                       (applicant and str(app.get('applicant', '')).strip().lower() == applicant.strip().lower()):
+                        status = app.get('status', 'Pending')
+                        return json_response({'success': True, 'status': status})
+        except Exception:
+            continue
+    return json_response({'success': True, 'status': 'Pending'})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
