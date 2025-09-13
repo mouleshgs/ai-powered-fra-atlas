@@ -129,6 +129,8 @@
     let lastAppDocId = null;
     let lastAppStatus = null;
     let lastApplicant = null;
+    let lastVillage = null;
+    let lastStateKey = null;
 
     function loadApplication() {
       db.collection('applications')
@@ -142,6 +144,8 @@
             lastAppDocId = doc.id;
             lastAppStatus = app.status || 'Pending';
             lastApplicant = app.applicant || '';
+            lastVillage = app.village || '';
+            lastStateKey = app.stateKey || '';
             showApplicationCard(app);
             beforeApply.style.display = 'none';
           } else {
@@ -171,17 +175,18 @@
     }
 
     document.getElementById('trackProgressBtn').onclick = function() {
-      // Fetch latest status from backend, send both userId and applicant name
       fetch('/get_app_status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: currentUser.uid, applicant: lastApplicant })
+        body: JSON.stringify({
+          userId: currentUser.uid,
+          applicant: lastApplicant
+        })
       })
       .then(res => res.json())
       .then(data => {
         if (data.success && data.status) {
           updateProgressStatus(data.status);
-          // Also update in Firestore for consistency
           if (lastAppDocId && data.status !== lastAppStatus) {
             db.collection('applications').doc(lastAppDocId).update({ status: data.status });
             lastAppStatus = data.status;
@@ -246,5 +251,9 @@
       }
     });
   </script>
+</body>
+</html>
+</body>
+</html>
 </body>
 </html>

@@ -112,8 +112,18 @@ def save_app():
         return json_response({'success': False, 'message': 'updatedApp must be an object'}, 400)
 
     if found_app_index is not None:
+        # Ensure village and stateKey are always present in the geojson application
         apps[found_app_index].update(updatedApp)
+        if 'village' in updatedApp:
+            apps[found_app_index]['village'] = updatedApp['village']
+        if 'stateKey' in updatedApp:
+            apps[found_app_index]['stateKey'] = updatedApp['stateKey']
     else:
+        # Ensure village and stateKey are always present in the geojson application
+        if 'village' not in updatedApp and 'village' in props:
+            updatedApp['village'] = props['village']
+        if 'stateKey' not in updatedApp and 'stateKey' in props:
+            updatedApp['stateKey'] = props['stateKey']
         apps.append(updatedApp)
 
     try:
@@ -154,12 +164,12 @@ def geocode():
 def get_app_status():
     data = request.get_json(force=True)
     user_id = data.get('userId')
-    applicant = data.get('applicant')  # Pass applicant name from frontend for fallback
+    applicant = data.get('applicant')
+    # fallback: only userId or applicant
     if not user_id and not applicant:
         return json_response({'success': False, 'message': 'Missing userId/applicant'}, 400)
 
-    # Search all geojson files for this user's application
-    for state_key, filename in STATE_FILE_MAP.items():
+    for state_key_map, filename in STATE_FILE_MAP.items():
         file_path = os.path.join(GEOJSON_DIR, filename)
         if not os.path.isfile(file_path):
             continue
@@ -171,14 +181,18 @@ def get_app_status():
                 props = feat.get('properties', {})
                 apps = props.get('applications', [])
                 for app in apps:
-                    # Prefer userId match, fallback to applicant name (case-insensitive)
-                    if (user_id and str(app.get('userId')) == str(user_id)) or \
-                       (applicant and str(app.get('applicant', '')).strip().lower() == applicant.strip().lower()):
+                    # Match by userId if present, else fallback to applicant name (case-insensitive)
+                    if (user_id and str(app.get('userId')) == str(user_id)) or (
+                        applicant and str(app.get('applicant', '')).strip().lower() == applicant.strip().lower()
+                    ):
                         status = app.get('status', 'Pending')
                         return json_response({'success': True, 'status': status})
         except Exception:
             continue
     return json_response({'success': True, 'status': 'Pending'})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

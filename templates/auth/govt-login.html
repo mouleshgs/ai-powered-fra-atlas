@@ -24,33 +24,32 @@
             <button type="submit">Login</button>
         </form>
     </div>
-    <script>
-        // Your Firebase config
-        const firebaseConfig = {
-            apiKey: "AIzaSyB8FWKokLgsgJ_uDDF1HSWh6brugLjK_9g",
-            authDomain: "sih-fra.firebaseapp.com",
-            projectId: "sih-fra",
-            storageBucket: "sih-fra.appspot.com",
-            messagingSenderId: "808806324009",
-            appId: "1:808806324009:web:5fd76cefa57b89c28c8938"
-        };
-        firebase.initializeApp(firebaseConfig);
-
-        const auth = firebase.auth();
-
-        document.getElementById('loginForm').addEventListener('submit', function() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            document.getElementById('error').textContent = '';
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Redirect to dashboard or admin page
-                    window.location.href = "/admin/dashboard";
-                })
-                .catch((error) => {
-                    document.getElementById('error').textContent = error.message;
-                });
-        });
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+      import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+      const firebaseConfig = {
+        apiKey: "AIzaSyDUNvIPk1UjRVU3EOPYBy4shGCxCGq6DdU",
+        authDomain: "sih-user-775cc.firebaseapp.com",
+        projectId: "sih-user-775cc",
+        storageBucket: "sih-user-775cc.firebasestorage.app",
+        messagingSenderId: "326214692169",
+        appId: "1:326214692169:web:c2c9baa5ce6383df81be98"
+      };
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        document.getElementById('error').textContent = '';
+        signInWithEmailAndPassword(auth, email, password)
+          .then(() => {
+            window.location.href = "/admin/dashboard";
+          })
+          .catch((error) => {
+            document.getElementById('error').textContent = error.message;
+          });
+      });
     </script>
 </body>
 </html>
