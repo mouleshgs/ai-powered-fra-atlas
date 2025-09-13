@@ -50,18 +50,7 @@
         "@id": "relation/19480212",
         "landuse": "forest",
         "type": "multipolygon",
-        "@geometry": "center",
-        "applications": [
-          {
-            "id": "app-od-1",
-            "applicant": "Raju Tribal",
-            "tribal_note": "Claiming area near here",
-            "status": "rejected",
-            "created_at": "2025-09-13T10:00:00Z",
-            "admin_note": "",
-            "updated_at": "2025-09-13T13:26:54.583Z"
-          }
-        ]
+        "@geometry": "center"
       },
       "geometry": {
         "type": "Point",

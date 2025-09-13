@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forest User Login / Signup</title>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 400px; margin: 80px auto; background: #fff; padding: 32px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);}
+        .container h2 { text-align: center; }
+        .container input { width: 100%; padding: 10px; margin: 10px 0; }
+        .container button { width: 100%; padding: 10px; background: #388e3c; color: #fff; border: none; border-radius: 4px; }
+        .toggle { text-align: center; margin-top: 10px; }
+        .error { color: red; text-align: center; }
+        .profile-bar { position: absolute; top: 20px; right: 30px; display: flex; align-items: center; }
+        .profile-icon { width: 40px; height: 40px; border-radius: 50%; background: #388e3c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-right: 10px; }
+        .logout-btn { padding: 8px 16px; background: #d32f2f; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+        .profile-bar[hidden] { display: none; }
+    </style>
+</head>
+<body>
+    <div class="profile-bar" id="profileBar" hidden>
+        <div class="profile-icon" id="profileIcon" title="Profile"></div>
+        <button class="logout-btn" id="logoutBtn">Logout</button>
+    </div>
+    <div class="container" id="loginContainer">
+        <h2 id="formTitle">User Login</h2>
+        <div id="error" class="error"></div>
+        <form id="loginForm" onsubmit="return false;">
+            <input type="email" id="email" placeholder="Email" required autofocus>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit" id="loginBtn">Login</button>
+        </form>
+        <form id="signupForm" style="display:none;" onsubmit="return false;">
+            <input type="email" id="signupEmail" placeholder="Email" required>
+            <input type="password" id="signupPassword" placeholder="Password" required>
+            <button type="submit" id="signupBtn">Sign Up</button>
+        </form>
+        <div class="toggle">
+            <span id="toggleText">Don't have an account?</span>
+            <a href="#" id="toggleLink">Sign Up</a>
+        </div>
+    </div>
+    <script>
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyB8FWKokLgsgJ_uDDF1HSWh6brugLjK_9g",
+            authDomain: "sih-fra.firebaseapp.com",
+            projectId: "sih-fra",
+            storageBucket: "sih-fra.appspot.com",
+            messagingSenderId: "808806324009",
+            appId: "1:808806324009:web:5fd76cefa57b89c28c8938"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Profile and logout logic
+        const profileBar = document.getElementById('profileBar');
+        const profileIcon = document.getElementById('profileIcon');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginContainer = document.getElementById('loginContainer');
+
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                // Show profile bar, hide login
+                profileBar.hidden = false;
+                loginContainer.style.display = 'none';
+                profileIcon.textContent = user.email ? user.email[0].toUpperCase() : 'U';
+                profileIcon.title = user.email;
+                // Redirect to apply page
+                window.location.href = "/user/apply";
+            } else {
+                profileBar.hidden = true;
+                loginContainer.style.display = '';
+            }
+        });
+
+        logoutBtn.onclick = function() {
+            auth.signOut().then(() => {
+                window.location.reload();
+            });
+        };
+
+        // Toggle between login and signup
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const formTitle = document.getElementById('formTitle');
+        const toggleText = document.getElementById('toggleText');
+        const toggleLink = document.getElementById('toggleLink');
+        const errorDiv = document.getElementById('error');
+
+        toggleLink.addEventListener('click', function() {
+            if (loginForm.style.display !== 'none') {
+                loginForm.style.display = 'none';
+                signupForm.style.display = '';
+                formTitle.textContent = 'User Sign Up';
+                toggleText.textContent = 'Already have an account?';
+                toggleLink.textContent = 'Login';
+                errorDiv.textContent = '';
+            } else {
+                loginForm.style.display = '';
+                signupForm.style.display = 'none';
+                formTitle.textContent = 'User Login';
+                toggleText.textContent = "Don't have an account?";
+                toggleLink.textContent = 'Sign Up';
+                errorDiv.textContent = '';
+            }
+        });
+
+        loginForm.addEventListener('submit', function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            errorDiv.textContent = '';
+            auth.signInWithEmailAndPassword(email, password)
+                .catch((error) => {
+                    errorDiv.textContent = error.message;
+                });
+        });
+
+        signupForm.addEventListener('submit', function() {
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            errorDiv.textContent = '';
+            auth.createUserWithEmailAndPassword(email, password)
+                .catch((error) => {
+                    errorDiv.textContent = error.message;
+                });
+        });
+    </script>
+</body>
+</html>

@@ -10,18 +10,7 @@
         "@id": "relation/15638678",
         "landuse": "forest",
         "type": "multipolygon",
-        "@geometry": "center",
-        "applications": [
-          {
-            "id": "app-mp-1",
-            "applicant": "Amash",
-            "tribal_note": "Pattaa Appliedd",
-            "status": "approved",
-            "created_at": "2025-09-13T10:00:00Z",
-            "admin_note": "",
-            "updated_at": "2025-09-13T13:37:15.505Z"
-          }
-        ]
+        "@geometry": "center"
       },
       "geometry": {
         "type": "Point",
@@ -400,22 +389,7 @@
         "protect_class": "4",
         "wikidata": "Q2769992",
         "wikipedia": "en:Ratanmahal Wildlife Sanctuary",
-        "@geometry": "center",
-        "applications": [
-          {
-            "id": "app-user-1757775688548",
-            "applicant": "Moulesh",
-            "tribal_note": "Patta will be done soon",
-            "coords": [
-              74.3712792,
-              22.2319731
-            ],
-            "status": "approved",
-            "created_at": "2025-09-13T15:01:28.548Z",
-            "admin_note": "Super brooooo",
-            "updated_at": "2025-09-13T15:01:55.035Z"
-          }
-        ]
+        "@geometry": "center"
       },
       "geometry": {
         "type": "Point",
@@ -1751,16 +1725,17 @@
         "@geometry": "center",
         "applications": [
           {
-            "id": "app-user-1757775561554",
-            "applicant": "Kumar",
-            "tribal_note": "ad",
+            "id": "app-user-1757791007001",
+            "applicant": "Amash",
+            "tribal_note": "Im getting patta",
             "coords": [
-              74.9057351,
-              23.5205969
+              74.8312636,
+              23.4842022
             ],
-            "status": "pending",
-            "created_at": "2025-09-13T14:59:21.554Z",
-            "admin_note": ""
+            "status": "rejected",
+            "created_at": "2025-09-13T19:16:47.001Z",
+            "admin_note": "Good to go",
+            "updated_at": "2025-09-13T19:21:58.659Z"
           }
         ]
       },
@@ -3458,22 +3433,7 @@
       "properties": {
         "@id": "way/1221722108",
         "landuse": "forest",
-        "@geometry": "center",
-        "applications": [
-          {
-            "id": "app-user-1757774822760",
-            "applicant": "kumar",
-            "tribal_note": "aa",
-            "coords": [
-              77.337299,
-              23.6573552
-            ],
-            "status": "approved",
-            "created_at": "2025-09-13T14:47:02.760Z",
-            "admin_note": "",
-            "updated_at": "2025-09-13T16:34:31.177Z"
-          }
-        ]
+        "@geometry": "center"
       },
       "geometry": {
         "type": "Point",
@@ -3489,34 +3449,7 @@
       "properties": {
         "@id": "way/1221722109",
         "landuse": "forest",
-        "@geometry": "center",
-        "applications": [
-          {
-            "id": "app-user-1757782322886",
-            "applicant": "moulesh1",
-            "tribal_note": "dzsf",
-            "coords": [
-              77.337299,
-              23.6573552
-            ],
-            "status": "pending",
-            "created_at": "2025-09-13T16:52:02.886Z",
-            "admin_note": ""
-          },
-          {
-            "id": "app-user-1757782328197",
-            "applicant": "moulesh1",
-            "tribal_note": "dzsf",
-            "coords": [
-              77.337299,
-              23.6573552
-            ],
-            "status": "approved",
-            "created_at": "2025-09-13T16:52:08.197Z",
-            "admin_note": "",
-            "updated_at": "2025-09-13T16:53:48.727Z"
-          }
-        ]
+        "@geometry": "center"
       },
       "geometry": {
         "type": "Point",
@@ -3532,22 +3465,7 @@
       "properties": {
         "@id": "way/1221722110",
         "landuse": "forest",
-        "@geometry": "center",
-        "applications": [
-          {
-            "id": "app-user-1757782341428",
-            "applicant": "moulesh1",
-            "tribal_note": "dzsf",
-            "coords": [
-              77.31017551283004,
-              23.689074974126477
-            ],
-            "status": "approved",
-            "created_at": "2025-09-13T16:52:21.428Z",
-            "admin_note": "",
-            "updated_at": "2025-09-13T16:53:50.276Z"
-          }
-        ]
+        "@geometry": "center"
       },
       "geometry": {
         "type": "Point",

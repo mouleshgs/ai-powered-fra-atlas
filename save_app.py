@@ -25,11 +25,20 @@ GEOJSON_DIR = os.path.join(app.root_path, "static", "geojson")
 
 @app.route('/')
 def home():
+    return render_template('forestuserslogin.html')
+
+@app.route('/user/apply')
+def user_apply():
     return render_template('user/apply.html')
 
 @app.route('/admin')
 def admin():
+    return render_template('auth/govt-login.html')
+
+@app.route('/admin/dashboard')
+def admin_dashboard():
     return render_template('index.html')
+
 
 def json_response(data, status=200):
     resp = jsonify(data)
@@ -106,8 +115,18 @@ def save_app():
         return json_response({'success': False, 'message': 'updatedApp must be an object'}, 400)
 
     if found_app_index is not None:
+        # Ensure village and stateKey are always present in the geojson application
         apps[found_app_index].update(updatedApp)
+        if 'village' in updatedApp:
+            apps[found_app_index]['village'] = updatedApp['village']
+        if 'stateKey' in updatedApp:
+            apps[found_app_index]['stateKey'] = updatedApp['stateKey']
     else:
+        # Ensure village and stateKey are always present in the geojson application
+        if 'village' not in updatedApp and 'village' in props:
+            updatedApp['village'] = props['village']
+        if 'stateKey' not in updatedApp and 'stateKey' in props:
+            updatedApp['stateKey'] = props['stateKey']
         apps.append(updatedApp)
 
     try:
@@ -144,6 +163,7 @@ def geocode():
     except Exception as e:
         return json_response({"success": False, "message": str(e)}, 500)
 
+
 @app.route("/extract_patta", methods=["POST"])
 def extract_patta_endpoint():
     state_key = request.form.get("stateKey")
@@ -157,6 +177,38 @@ def extract_patta_endpoint():
 
     data["state"] = state_key
     return jsonify(data)
+
+@app.route('/get_app_status', methods=['POST'])
+def get_app_status():
+    data = request.get_json(force=True)
+    user_id = data.get('userId')
+    applicant = data.get('applicant')
+    # fallback: only userId or applicant
+    if not user_id and not applicant:
+        return json_response({'success': False, 'message': 'Missing userId/applicant'}, 400)
+
+    for state_key_map, filename in STATE_FILE_MAP.items():
+        file_path = os.path.join(GEOJSON_DIR, filename)
+        if not os.path.isfile(file_path):
+            continue
+        try:
+            with open(file_path, 'r', encoding='utf-8') as fh:
+                geo = json.load(fh)
+            features = geo.get('features', [])
+            for feat in features:
+                props = feat.get('properties', {})
+                apps = props.get('applications', [])
+                for app in apps:
+                    # Match by userId if present, else fallback to applicant name (case-insensitive)
+                    if (user_id and str(app.get('userId')) == str(user_id)) or (
+                        applicant and str(app.get('applicant', '')).strip().lower() == applicant.strip().lower()
+                    ):
+                        status = app.get('status', 'Pending')
+                        return json_response({'success': True, 'status': status})
+        except Exception:
+            continue
+    return json_response({'success': True, 'status': 'Pending'})
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
