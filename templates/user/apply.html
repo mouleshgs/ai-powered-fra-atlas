@@ -1,39 +1,145 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8">
   <title>Apply for Forest Access</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
-    body{font-family:system-ui,Arial;margin:12px;color:#111}
-    .card{max-width:860px;margin:0 auto;padding:12px;border:1px solid #ddd;border-radius:8px;background:#fff}
-    label{display:block;margin-top:8px;font-weight:600}
-    input[type="text"],textarea,select{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:6px;box-sizing:border-box}
-    button{margin-top:12px;padding:10px 12px;border:0;border-radius:6px;background:#2b8c2b;color:#fff;font-weight:700;cursor:pointer}
-    #status{margin-top:12px;font-size:14px}
-    #map { height: 360px; margin-top:10px; border-radius:6px; }
-    .small { font-size:13px; color:#444; margin-top:6px; }
-    .btn-secondary { background:#f0ad4e; margin-left:8px; color:#fff; }
+    body {
+      font-family: system-ui, Arial, sans-serif;
+      margin: 12px;
+      color: #111;
+      background-color: #f9f9f9;
+    }
+
+    .card {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    h2 {
+      margin-bottom: 8px;
+      color: #2b8c2b;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    textarea,
+    select,
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #2b8c2b;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #276c26;
+    }
+
+    .btn-secondary {
+      background: #f0ad4e;
+      color: #fff;
+      margin-left: 8px;
+    }
+
+    #status {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #444;
+    }
+
+    #map {
+      height: 360px;
+      margin-top: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #666;
+      margin-top: 6px;
+    }
+
+    #result {
+      display: none;
+      margin-top: 20px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #f7f7f7;
+    }
+
+    #result h3 {
+      margin-top: 0;
+      color: #2b8c2b;
+    }
+
+    .flex-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
   </style>
 </head>
 <body>
   <div class="card">
     <h2>Apply as Tribal Applicant</h2>
+    <div class="small">
+      Upload your Patta to auto-extract details or fill manually below. You may also select a location on the map.
+    </div>
 
-    <div class="small">Enter name, village and state. You may geocode the village or pick a spot on the map (Choose different spot).</div>
+    <!-- Patta Upload Section -->
+    <label for="pattaFile">Upload Patta (Image)</label>
+    <input type="file" id="pattaFile" accept="image/*" />
+    <div class="flex-row">
+      <button type="button" id="extractBtn">Extract Details from Patta</button>
+      <div id="extractedInfo" class="small"></div>
+    </div>
 
     <form id="applyForm">
-      <label>Name</label>
-      <input id="applicant" type="text" required placeholder="Your name" />
+      <label for="applicant">Name</label>
+      <input id="applicant" type="text" placeholder="Your full name" required />
 
-      <label>Tribal note / Reason</label>
+      <label for="tribal_note">Tribal note / Reason</label>
       <textarea id="tribal_note" rows="3" placeholder="Explain why you are applying"></textarea>
 
-      <label>Village name</label>
+      <label for="village">Village name</label>
       <input id="village" type="text" placeholder="e.g. Bhojapura" />
 
-      <label>State</label>
+      <label for="stateKey">State</label>
       <select id="stateKey" required>
         <option value="">-- choose state --</option>
         <option value="mp">Madhya Pradesh</option>
@@ -42,21 +148,27 @@
         <option value="telangana">Telangana</option>
       </select>
 
-      <div style="display:flex;gap:8px;align-items:center">
+      <div class="flex-row">
         <button type="submit">Find & Apply</button>
         <button id="chooseManual" type="button" class="btn-secondary">Choose different spot</button>
-        <div id="manualHint" class="small" style="margin-left:8px;color:#666"></div>
+        <div id="manualHint" class="small"></div>
       </div>
+
+      <!-- Hidden fields auto-filled after OCR -->
+      <input type="hidden" id="ocr_applicant" name="applicant">
+      <input type="hidden" id="ocr_village" name="village">
+      <input type="hidden" id="ocr_stateKey" name="stateKey">
+      <input type="hidden" id="ocr_tribal_note" name="tribal_note">
     </form>
 
     <div id="status" aria-live="polite"></div>
 
     <div id="map" aria-hidden="false"></div>
 
-    <div id="result" style="display:none;margin-top:10px">
+    <div id="result">
       <h3>Matched Forest</h3>
       <div id="matchInfo" class="small"></div>
-      <div style="margin-top:8px">
+      <div class="flex-row">
         <button id="confirmBtn" style="background:#1f6feb">Confirm and Submit Application</button>
         <button id="resetSelection" type="button" class="btn-secondary">Clear selection</button>
       </div>
