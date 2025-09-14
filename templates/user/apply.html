@@ -39,6 +39,41 @@
       <form id="applyForm">
         <label>Name</label>
         <input id="applicant" type="text" required placeholder="Your name" />
+        <label>Upload patta / land record image (optional)</label>
+        <input id="pattaFile" type="file" accept="image/*" />
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="extractBtn" type="button" class="btn-secondary">Extract from Image</button>
+          <span class="small">Use this to auto-fill Name, Father's Name, Village and Khata No.</span>
+        </div>
+        <div id="extractSpinner" style="display:none;margin-top:8px">Processing image... <span style="font-weight:700">⏳</span></div>
+        <div id="extractedPreview" style="display:none;border:1px dashed #ddd;padding:8px;margin-top:8px;background:#fafafa">
+          <div style="font-weight:700;margin-bottom:6px">Extraction preview (edit as needed)</div>
+          <div><b>Raw OCR Text:</b>
+            <pre id="rawText" style="white-space:pre-wrap;background:#fff;border:1px solid #eee;padding:8px;border-radius:4px;max-height:140px;overflow:auto"></pre>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <div style="flex:1">
+              <label>Extracted Name</label>
+              <input id="previewName" type="text" />
+              <label>Extracted Father's Name</label>
+              <input id="previewFather" type="text" />
+            </div>
+            <div style="flex:1">
+              <label>Extracted Village</label>
+              <input id="previewVillage" type="text" />
+              <label>Extracted Khata/Survey No</label>
+              <input id="previewKhata" type="text" />
+            </div>
+          </div>
+          <div style="margin-top:8px">
+            <button id="applyExtracted" type="button">Apply to Form</button>
+            <button id="dismissExtracted" type="button" class="btn-secondary">Dismiss</button>
+          </div>
+        </div>
+        <label>Father's Name</label>
+        <input id="fatherName" type="text" placeholder="Father's name" />
+        <label>Khata / Survey No.</label>
+        <input id="khataNo" type="text" placeholder="Khata or Survey number" />
         <label>Tribal note / Reason</label>
         <textarea id="tribal_note" rows="3" placeholder="Explain why you are applying"></textarea>
         <label>Village name</label>
@@ -83,6 +118,89 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
   <script src="{{ url_for('static', filename='apply.js') }}"></script>
+  <script>
+    // Image extraction logic: upload to server /extract_patta and fill fields
+    document.getElementById('extractBtn').onclick = function() {
+      const fileInput = document.getElementById('pattaFile');
+      const state = document.getElementById('stateKey').value;
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert('Please select an image file first');
+        return;
+      }
+      if (!state) {
+        alert('Please choose a state first');
+        return;
+      }
+      const file = fileInput.files[0];
+      const fd = new FormData();
+      fd.append('image', file);
+      fd.append('state', state);
+      const spinner = document.getElementById('extractSpinner');
+      const preview = document.getElementById('extractedPreview');
+      spinner.style.display = '';
+      preview.style.display = 'none';
+      fetch('/extract_patta', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(data => {
+          spinner.style.display = 'none';
+          if (!data.success) {
+            alert('Extraction failed: ' + (data.message || 'unknown'));
+            return;
+          }
+          const f = data.fields || {};
+          // prefer server-side translations when available
+          const t = f.Translated || {};
+          // populate preview
+          const rawText = f.RawText || '';
+          document.getElementById('rawText').textContent = rawText;
+
+          // choose translated value first, then fallback to raw extracted fields
+          let previewName = (t.name || f.Name || '').replace(/\n/g, ' ').trim();
+          let previewFather = (t.father_name || f.Father || '').replace(/\n/g, ' ').trim();
+          let previewVillage = (t.village || f.Village || '').replace(/\n/g, ' ').trim();
+          let previewKhata = (t.khata_no || f['Khata/Survey No'] || '').replace(/\n/g, ' ').trim();
+
+          // Heuristic: if name equals father (common mis-assignment), try extracting name between 'नाम' and 'पिता' in raw OCR text (Hindi-specific)
+          try {
+            if (previewName && previewFather && previewName === previewFather && rawText) {
+              const m = rawText.match(/नाम[:\s]*([\s\S]*?)पिता/i);
+              if (m && m[1]) {
+                // take non-empty lines inside the match and join them
+                const candidate = m[1].split(/\n/).map(s => s.trim()).filter(Boolean).join(' ').trim();
+                if (candidate) {
+                  // prefer translated candidate if translation exists for that segment
+                  previewName = candidate;
+                }
+              }
+            }
+          } catch (e) {
+            // ignore heuristic failures
+          }
+
+          document.getElementById('previewName').value = previewName;
+          document.getElementById('previewFather').value = previewFather;
+          document.getElementById('previewVillage').value = previewVillage;
+          document.getElementById('previewKhata').value = previewKhata;
+          preview.style.display = '';
+        })
+        .catch(err => {
+          spinner.style.display = 'none';
+          alert('Extraction request failed: ' + err);
+        });
+    };
+
+    // apply preview to form
+    document.getElementById('applyExtracted').onclick = function() {
+      document.getElementById('applicant').value = document.getElementById('previewName').value.trim();
+      document.getElementById('fatherName').value = document.getElementById('previewFather').value.trim();
+      document.getElementById('village').value = document.getElementById('previewVillage').value.trim();
+      document.getElementById('khataNo').value = document.getElementById('previewKhata').value.trim();
+      document.getElementById('extractedPreview').style.display = 'none';
+    };
+    document.getElementById('dismissExtracted').onclick = function() {
+      document.getElementById('extractedPreview').style.display = 'none';
+    };
+  </script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyB8FWKokLgsgJ_uDDF1HSWh6brugLjK_9g",

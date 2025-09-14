@@ -1,6 +1,12 @@
 from flask import Flask, request, jsonify, send_from_directory, render_template
 import os, json, tempfile
 import requests
+import traceback
+
+try:
+    import patta_ocr
+except Exception:
+    patta_ocr = None
 
 app = Flask(__name__)
 
@@ -44,6 +50,50 @@ def json_response(data, status=200):
         resp.headers['Access-Control-Allow-Origin'] = '*'
         resp.headers['Access-Control-Allow-Headers'] = 'Content-Type'
     return resp
+
+
+@app.route('/extract_patta', methods=['POST'])
+def extract_patta():
+    # Accepts multipart/form-data with 'image' file and 'state' field
+    if 'image' not in request.files:
+        return json_response({'success': False, 'message': 'Missing image file'}, 400)
+
+    f = request.files['image']
+    state = request.form.get('state') or request.form.get('stateKey') or request.args.get('state')
+    if not state:
+        return json_response({'success': False, 'message': 'Missing state parameter'}, 400)
+
+    if patta_ocr is None:
+        return json_response({'success': False, 'message': 'OCR module not available on server'}, 500)
+
+    # Save to a temporary file
+    fd, tmp_path = tempfile.mkstemp(prefix='patta_', suffix=os.path.splitext(f.filename)[1] or '.png')
+    os.close(fd)
+    try:
+        f.save(tmp_path)
+        # Run OCR using enhanced pipeline and request translation
+        try:
+            result = patta_ocr.run_ocr_on_file_internal(tmp_path, state, use_enhance=True, translate=True)
+        except Exception as e:
+            return json_response({'success': False, 'message': 'OCR error: ' + str(e), 'trace': traceback.format_exc()}, 500)
+
+        # return more fields: Parsed and Translated
+        fields = {
+            'Name': result.get('Name'),
+            'Father': result.get('Father'),
+            'Village': result.get('Village'),
+            'Khata/Survey No': result.get('Khata/Survey No'),
+            'RawText': result.get('RawText'),
+            'Parsed': result.get('Parsed'),
+            'Translated': result.get('Translated', {})
+        }
+        return json_response({'success': True, 'fields': fields})
+    finally:
+        try:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+        except Exception:
+            pass
 
 # Endpoint to get geojson dynamically
 @app.route('/geojson/<state>')
