@@ -251,6 +251,11 @@ def geocode():
     except Exception as e:
         return json_response({"success": False, "message": str(e)}, 500)
 
+@app.route('/user/application_details.html')
+def application_details():
+    return render_template('user/application_details.html')
+
+
 @app.route('/get_app_status', methods=['POST'])
 def get_app_status():
     data = request.get_json(force=True)
@@ -277,8 +282,29 @@ def get_app_status():
                         applicant and str(app.get('applicant', '')).strip().lower() == applicant.strip().lower()
                     ):
                         status = app.get('status', 'Pending')
+                        # Sync status to Firebase (force update every time)
+                        try:
+                            import firebase_admin
+                            from firebase_admin import credentials, firestore as fb_firestore
+                            if not firebase_admin._apps:
+                                cred = credentials.ApplicationDefault()
+                                firebase_admin.initialize_app(cred)
+                            fb_db = fb_firestore.client()
+                            query = fb_db.collection('applications')
+                            if user_id:
+                                docs = query.where('userId', '==', user_id).stream()
+                            elif applicant:
+                                docs = query.where('applicant', '==', applicant).stream()
+                            else:
+                                docs = []
+                            for doc in docs:
+                                doc_ref = fb_db.collection('applications').document(doc.id)
+                                doc_ref.update({'status': status})
+                        except Exception as e:
+                            print('Firebase sync error:', e)
                         return json_response({'success': True, 'status': status})
-        except Exception:
+        except Exception as e:
+            print('Geojson read error:', e)
             continue
     return json_response({'success': True, 'status': 'Pending'})
 

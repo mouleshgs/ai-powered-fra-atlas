@@ -1856,7 +1856,45 @@
       "properties": {
         "@id": "way/1026791127",
         "landuse": "forest",
-        "@geometry": "center"
+        "@geometry": "center",
+        "applications": [
+          {
+            "id": "app-user-1757965553641",
+            "applicant": "ram Kumar",
+            "tribal_note": "",
+            "coords": [
+              75.8681996,
+              22.7203616
+            ],
+            "status": "rejected",
+            "created_at": "2025-09-15T19:45:53.641Z",
+            "admin_note": "",
+            "dss_recommendations": [
+              {
+                "scheme": "Jal Jeevan Mission",
+                "raw_score": 80.0,
+                "reasons": [
+                  "National programme to provide safe and adequate drinking water through individual household tap connections by 2024 to all rural households.",
+                  "No piped water"
+                ],
+                "description": "National programme to provide safe and adequate drinking water through individual household tap connections by 2024 to all rural households.",
+                "url": "https://jaljeevanmission.gov.in/",
+                "score": 100
+              },
+              {
+                "scheme": "MGNREGA",
+                "raw_score": 30.0,
+                "reasons": [
+                  "Mahatma Gandhi National Rural Employment Guarantee Act — guarantees 100 days of wage employment to rural households, focusing on livelihood security."
+                ],
+                "description": "Mahatma Gandhi National Rural Employment Guarantee Act — guarantees 100 days of wage employment to rural households, focusing on livelihood security.",
+                "url": "https://nrega.nic.in/",
+                "score": 0
+              }
+            ],
+            "updated_at": "2025-09-15T20:03:00.530Z"
+          }
+        ]
       },
       "geometry": {
         "type": "Point",
@@ -3456,7 +3494,45 @@
       "properties": {
         "@id": "way/1221722108",
         "landuse": "forest",
-        "@geometry": "center"
+        "@geometry": "center",
+        "applications": [
+          {
+            "id": "app-user-1757965344749",
+            "applicant": ": Rajesh sinh",
+            "tribal_note": "",
+            "coords": [
+              77.337299,
+              23.6573552
+            ],
+            "status": "rejected",
+            "created_at": "2025-09-15T19:42:24.749Z",
+            "admin_note": "",
+            "dss_recommendations": [
+              {
+                "scheme": "Jal Jeevan Mission",
+                "raw_score": 80.0,
+                "reasons": [
+                  "National programme to provide safe and adequate drinking water through individual household tap connections by 2024 to all rural households.",
+                  "No piped water"
+                ],
+                "description": "National programme to provide safe and adequate drinking water through individual household tap connections by 2024 to all rural households.",
+                "url": "https://jaljeevanmission.gov.in/",
+                "score": 100
+              },
+              {
+                "scheme": "MGNREGA",
+                "raw_score": 30.0,
+                "reasons": [
+                  "Mahatma Gandhi National Rural Employment Guarantee Act — guarantees 100 days of wage employment to rural households, focusing on livelihood security."
+                ],
+                "description": "Mahatma Gandhi National Rural Employment Guarantee Act — guarantees 100 days of wage employment to rural households, focusing on livelihood security.",
+                "url": "https://nrega.nic.in/",
+                "score": 0
+              }
+            ],
+            "updated_at": "2025-09-15T20:02:55.485Z"
+          }
+        ]
       },
       "geometry": {
         "type": "Point",

@@ -487,7 +487,18 @@
       profileBar.style.display = 'flex';
       profileIcon.textContent = user.email ? user.email[0].toUpperCase() : 'U';
       profileIcon.title = user.email;
-      loadApplication();
+      // Check if user already applied, redirect if so
+      db.collection('applications')
+        .where('userId', '==', currentUser.uid)
+        .limit(1)
+        .get()
+        .then(snapshot => {
+          if (!snapshot.empty) {
+            window.location.href = 'application_details.html';
+          } else {
+            loadApplication();
+          }
+        });
     });
 
     logoutBtn.onclick = function() {
@@ -622,8 +633,8 @@
         dss_recommendations_snapshot: window.latestDssRecs || [],
         submittedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-                successDiv.textContent = "Application submitted!";
-                loadApplication();
+                // Redirect to details page after successful submit
+                window.location.href = 'application_details.html';
               }).catch(() => {
                 errorDiv.textContent = "Failed to submit application.";
               });
