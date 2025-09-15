@@ -24,6 +24,11 @@
     .app-popup .btn-approve { background:#2b8c2b; }
     .app-popup .btn-reject { background:#d9534f; }
     .app-popup .meta { margin-top:8px; font-size:12px; color:#666; }
+    /* admin extras */
+    #adminStats { position: absolute; left: 12px; bottom: 12px; background: rgba(255,255,255,0.95); padding:10px;border-radius:8px;border:1px solid #eee; font-size:13px }
+    .rec-snippet{margin-top:8px;font-size:13px;color:#222}
+    .rec-item{display:flex;align-items:center;gap:8px;margin-top:6px}
+    .rec-item a{color:var(--accent-2);font-weight:700;text-decoration:none}
   </style>
 </head>
 <body>
@@ -37,6 +42,21 @@
       <option value="telangana">Telangana</option>
     </select>
     <div id="info">Choose a state — valid points will be shown. Tripura has some invalid features (empty coordinates) which are ignored.</div>
+    <!-- New controls: search, filters, export -->
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <input id="searchInput" placeholder="Search applicant or village" style="padding:8px;border-radius:6px;border:1px solid #ddd;font-size:13px" />
+      <select id="statusFilter" style="padding:8px;border-radius:6px;border:1px solid #ddd;font-size:13px">
+        <option value="">All status</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+      <select id="schemeFilter" style="padding:8px;border-radius:6px;border:1px solid #ddd;font-size:13px">
+        <option value="">All schemes</option>
+      </select>
+      <input id="minScore" type="number" min="0" max="100" placeholder="min score" style="width:90px;padding:8px;border-radius:6px;border:1px solid #ddd;font-size:13px" />
+      <button id="exportCsvBtn" title="Export visible applications to CSV" style="padding:8px 10px;border-radius:6px;border:0;background:#1976d2;color:#fff;font-weight:700;cursor:pointer">Export CSV</button>
+    </div>
   </div>
 
   <div id="map"></div>
@@ -294,7 +314,8 @@
     function renderApplicationsLayer(){
       appsLayerGroup.clearLayers();
       const apps = collectAppsFromFeatures();
-      apps.forEach(app => {
+      const visibleApps = filterApps(apps);
+      visibleApps.forEach(app => {
         // prefer explicit coords on app else fallback to feature geometry
         let coords = app.coords;
         if(!Array.isArray(coords) && app._featureRef && app._featureRef.geometry){
@@ -309,6 +330,24 @@
 
         const statusText = escapeHtml(app.status || 'pending');
         const badgeColor = appColor(app.status || 'pending');
+
+        // DSS recommendations snippet
+        let recHtml = '';
+        try{
+          const recs = app.dss_recommendations || app.dss_recommendations_snapshot || [];
+          if(Array.isArray(recs) && recs.length){
+            recHtml = '<div class="rec-snippet"><strong>Recommendations</strong>';
+            recs.slice(0,3).forEach(r => {
+              const name = r.scheme || r[0] || '';
+              const score = r.score || r.raw_score || '';
+              const url = r.url || '';
+              recHtml += `<div class="rec-item">${escapeHtml(name)} <span style="background:#1976d2;color:#fff;padding:3px 6px;border-radius:10px;font-weight:700;margin-left:auto">${escapeHtml(String(score))}</span>`;
+              if(url) recHtml += ` <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">Learn</a>`;
+              recHtml += `</div>`;
+            });
+            recHtml += '</div>';
+          }
+        } catch(e){ recHtml = ''; }
 
         const popupHtml = `
           <div class="app-popup">
@@ -329,6 +368,7 @@
             </div>
 
             <div class="meta">App ID: ${escapeHtml(String(app.id || ''))} · Created: ${escapeHtml(String(app.created_at || '—'))}</div>
+            ${recHtml}
           </div>
         `;
 
@@ -378,6 +418,66 @@
         return json;
       });
     }
+
+    // Filtering helpers
+    function filterApps(apps){
+      const q = (document.getElementById('searchInput')||{}).value || '';
+      const status = (document.getElementById('statusFilter')||{}).value || '';
+      const scheme = (document.getElementById('schemeFilter')||{}).value || '';
+      const minScore = parseInt((document.getElementById('minScore')||{}).value || 0,10) || 0;
+      return apps.filter(a => {
+        if(status && String((a.status||'').toLowerCase()) !== status.toLowerCase()) return false;
+        if(q){ const qq = q.trim().toLowerCase(); if(!(String(a.applicant||'').toLowerCase().includes(qq) || String(a.village||'').toLowerCase().includes(qq))) return false; }
+        if(scheme){ const recs = a.dss_recommendations || a.dss_recommendations_snapshot || []; const found = (recs||[]).some(r => (r.scheme || r[0] || '').toLowerCase() === scheme.toLowerCase()); if(!found) return false; }
+        if(minScore){ const recs = a.dss_recommendations || a.dss_recommendations_snapshot || []; const high = (recs||[]).some(r => ((r.score||r.raw_score||0) >= minScore)); if(!high) return false; }
+        return true;
+      });
+    }
+
+    // Populate schemeFilter based on known schemes in current data
+    function populateSchemeFilter(){
+      const set = new Set();
+      Object.values(perStateData).forEach(fc => {
+        (fc.features||[]).forEach(feat => {
+          (feat.properties && feat.properties.applications || []).forEach(a => {
+            (a.dss_recommendations || a.dss_recommendations_snapshot || []).forEach(r => {
+              const name = r.scheme || r[0] || ''; if(name) set.add(name);
+            });
+          });
+        });
+      });
+      const sel = document.getElementById('schemeFilter'); if(!sel) return;
+      const cur = sel.value || '';
+      sel.innerHTML = '<option value="">All schemes</option>' + Array.from(set).map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+      if(cur) sel.value = cur;
+    }
+
+    // Export visible applications to CSV
+    function exportVisibleAppsToCSV(){
+      const apps = collectAppsFromFeatures();
+      const visible = filterApps(apps);
+      if(!visible.length){ alert('No applications to export'); return; }
+      const cols = ['id','applicant','village','stateKey','status','dss_schemes','dss_top_score','admin_note'];
+      const rows = visible.map(a => {
+        const recs = a.dss_recommendations || a.dss_recommendations_snapshot || [];
+        const schemes = (recs||[]).map(r=>r.scheme || r[0] || '').join('|');
+        const top = (recs && recs.length) ? (recs[0].score || recs[0].raw_score || '') : '';
+        return [a.id||'', a.applicant||'', a.village||'', a.stateKey||'', a.status||'', schemes, top, a.admin_note||''];
+      });
+      const csv = [cols.join(',')].concat(rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(','))).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'applications_export.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', () => renderApplicationsLayer());
+    document.getElementById('statusFilter').addEventListener('change', () => renderApplicationsLayer());
+    document.getElementById('schemeFilter').addEventListener('change', () => renderApplicationsLayer());
+    document.getElementById('minScore').addEventListener('input', () => renderApplicationsLayer());
+    document.getElementById('exportCsvBtn').addEventListener('click', exportVisibleAppsToCSV);
+
+    // repopulate scheme filter after states loaded
+    setTimeout(populateSchemeFilter, 800);
 
     // Update application object inside the feature.properties.applications (in-memory) and persist
     function updateAppStatus(stateKey, featureId, appId, newStatus, adminNote){

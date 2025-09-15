@@ -9,22 +9,47 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
-    body{font-family:system-ui,Arial;margin:12px;color:#111}
-    .card{max-width:860px;margin:0 auto;padding:12px;border:1px solid #ddd;border-radius:8px;background:#fff}
+    :root{
+      --bg:#f6f8fa; --card:#ffffff; --muted:#6b7280; --accent:#1976d2; --accent-2:#2b8c2b; --warning:#f0ad4e;
+    }
+    html,body{height:100%;}
+    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; color:#111; background:var(--bg)}
+    .page { max-width:1100px; margin:24px auto; padding:18px; }
+    .card{max-width:100%;margin:0 auto;padding:18px;border-radius:12px;background:var(--card);box-shadow:0 6px 18px rgba(15,23,42,0.06);border:1px solid rgba(15,23,42,0.04)}
     label{display:block;margin-top:8px;font-weight:600}
-    input[type="text"],textarea,select{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:6px;box-sizing:border-box}
-    button{margin-top:12px;padding:10px 12px;border:0;border-radius:6px;background:#2b8c2b;color:#fff;font-weight:700;cursor:pointer}
-    #status{margin-top:12px;font-size:14px}
-    #map { height: 360px; margin-top:10px; border-radius:6px; }
-    .small { font-size:13px; color:#444; margin-top:6px; }
-    .btn-secondary { background:#f0ad4e; margin-left:8px; color:#fff; }
-    .container { max-width: 860px; margin: 0 auto; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #fff; }
-    .error { color: red; margin-top: 10px; }
-    .success { color: green; margin-top: 10px; }
-    .profile-bar { position: absolute; top: 20px; right: 30px; display: flex; align-items: center; }
-    .profile-icon { width: 40px; height: 40px; border-radius: 50%; background: #388e3c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-right: 10px; }
+    input[type="text"], textarea, select, input[type="number"]{width:100%;padding:10px;margin-top:6px;border:1px solid rgba(15,23,42,0.06);border-radius:8px;box-sizing:border-box;background:#fbfdff}
+    button{margin-top:12px;padding:10px 14px;border:0;border-radius:8px;background:var(--accent-2);color:#fff;font-weight:700;cursor:pointer}
+    #status{margin-top:12px;font-size:14px;color:var(--muted)}
+    #map { height: 360px; margin-top:10px; border-radius:8px; box-shadow: inset 0 0 0 1px rgba(15,23,42,0.02)}
+    .small { font-size:13px; color:var(--muted); margin-top:6px; }
+    .btn-secondary { background:var(--warning); margin-left:8px; color:#fff; }
+    .btn-primary { background:var(--accent); }
+    .error { color: #b00020; margin-top: 10px; }
+    .success { color: #166534; margin-top: 10px; }
+  .profile-bar { position: absolute; top: 22px; right: 28px; display: flex; align-items: center; gap:10px }
+  .profile-icon { width: 44px; height: 44px; border-radius: 50%; background: var(--accent-2); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-right: 6px; }
     .logout-btn { padding: 8px 16px; background: #d32f2f; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
     #applicationCard { background:#e8f5e9; margin-top:24px; }
+    /* DSS card styles */
+  .dss-cards { display:flex;flex-wrap:wrap;gap:12px }
+  .dss-card { background:linear-gradient(180deg,#fff,#fbfdff);border-radius:10px;padding:12px;border:1px solid rgba(15,23,42,0.04);box-shadow:0 6px 18px rgba(2,6,23,0.06);width:calc(50% - 12px);box-sizing:border-box;min-width:220px }
+    .dss-card .dss-row{display:flex;align-items:center;gap:8px}
+    .dss-icon{width:40px;height:40px;border-radius:8px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:20px}
+    .dss-title{font-weight:700}
+    .dss-badge{margin-left:auto;background:#1976d2;color:#fff;padding:4px 8px;border-radius:12px;font-weight:700;font-size:12px}
+    .dss-reasons{color:#555;margin-top:6px;font-size:13px}
+    .dss-help{margin-left:8px;color:#777;font-size:13px;cursor:help}
+  .dss-desc{color:#333;margin-top:8px;font-size:13px}
+  .dss-learn{display:inline-block;margin-top:6px;color:var(--accent);font-weight:700;text-decoration:none}
+    @media (max-width:760px){
+      .dss-card{width:100%}
+      .dss-cards{gap:10px}
+      .page{padding:12px}
+    }
+    /* Form grid */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .form-full{grid-column:1 / -1}
+    @media (max-width:900px){ .form-grid{grid-template-columns:1fr} }
   </style>
 </head>
 <body>
@@ -37,28 +62,31 @@
     <div id="beforeApply">
       <div class="small">Enter name, village and state. You may geocode the village or pick a spot on the map (Choose different spot).</div>
       <form id="applyForm">
-        <label>Name</label>
-        <input id="applicant" type="text" required placeholder="Your name" />
+        <div class="form-grid">
+          <div>
+            <label>Name</label>
+            <input id="applicant" type="text" required placeholder="Your name" />
+          </div>
         <label>Upload patta / land record image (optional)</label>
         <input id="pattaFile" type="file" accept="image/*" />
-        <div style="display:flex;gap:8px;align-items:center">
+        <div style="display:flex;gap:8px;align-items:center" class="form-full">
           <button id="extractBtn" type="button" class="btn-secondary">Extract from Image</button>
           <span class="small">Use this to auto-fill Name, Father's Name, Village and Khata No.</span>
         </div>
         <div id="extractSpinner" style="display:none;margin-top:8px">Processing image... <span style="font-weight:700">⏳</span></div>
-        <div id="extractedPreview" style="display:none;border:1px dashed #ddd;padding:8px;margin-top:8px;background:#fafafa">
+  <div id="extractedPreview" style="display:none;border:1px dashed rgba(15,23,42,0.04);padding:8px;margin-top:8px;background:#fafafa" class="form-full">
           <div style="font-weight:700;margin-bottom:6px">Extraction preview (edit as needed)</div>
           <div><b>Raw OCR Text:</b>
             <pre id="rawText" style="white-space:pre-wrap;background:#fff;border:1px solid #eee;padding:8px;border-radius:4px;max-height:140px;overflow:auto"></pre>
           </div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <div style="flex:1">
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+            <div style="flex:1;min-width:220px">
               <label>Extracted Name</label>
               <input id="previewName" type="text" />
               <label>Extracted Father's Name</label>
               <input id="previewFather" type="text" />
             </div>
-            <div style="flex:1">
+            <div style="flex:1;min-width:220px">
               <label>Extracted Village</label>
               <input id="previewVillage" type="text" />
               <label>Extracted Khata/Survey No</label>
@@ -69,27 +97,72 @@
             <button id="applyExtracted" type="button">Apply to Form</button>
             <button id="dismissExtracted" type="button" class="btn-secondary">Dismiss</button>
           </div>
+          <div id="dssRecommendations" style="margin-top:12px;display:none;border-top:1px solid #eee;padding-top:8px">
+            <div style="font-weight:700;margin-bottom:6px">Recommended Schemes</div>
+            <div id="dssList" class="small"></div>
+          </div>
         </div>
-        <label>Father's Name</label>
-        <input id="fatherName" type="text" placeholder="Father's name" />
-        <label>Khata / Survey No.</label>
-        <input id="khataNo" type="text" placeholder="Khata or Survey number" />
-        <label>Tribal note / Reason</label>
-        <textarea id="tribal_note" rows="3" placeholder="Explain why you are applying"></textarea>
-        <label>Village name</label>
-        <input id="village" type="text" placeholder="e.g. Bhojapura" />
-        <label>State</label>
-        <select id="stateKey" required>
+        <div class="form-grid">
+          <div>
+            <label>Father's Name</label>
+            <input id="fatherName" type="text" placeholder="Father's name" />
+            <label>Khata / Survey No.</label>
+            <input id="khataNo" type="text" placeholder="Khata or Survey number" />
+          </div>
+          <div>
+            <label>Tribal note / Reason</label>
+            <textarea id="tribal_note" rows="3" placeholder="Explain why you are applying"></textarea>
+            <label>Village name</label>
+            <input id="village" type="text" placeholder="e.g. Bhojapura" />
+          </div>
+          <div class="form-full">
+            <label>State</label>
+            <select id="stateKey" required>
           <option value="">-- choose state --</option>
           <option value="mp">Madhya Pradesh</option>
           <option value="odisha">Odisha</option>
           <option value="tripura">Tripura</option>
           <option value="telangana">Telangana</option>
         </select>
-        <div style="display:flex;gap:8px;align-items:center">
+  <!-- Manual DSS inputs -->
+  <fieldset style="margin-top:12px;padding:12px;border:1px solid rgba(15,23,42,0.04);border-radius:8px" class="form-full">
+          <legend style="font-weight:700">DSS Details (optional, you may fill manually)</legend>
+          <div style="display:flex;gap:8px">
+            <div style="flex:1">
+              <label>Land size (ha)</label>
+              <input id="dss_land_size" type="number" step="0.01" placeholder="e.g. 1.2" />
+              <label>Household size</label>
+              <input id="dss_household_size" type="number" step="1" placeholder="e.g. 5" />
+              <label>Income (annual INR)</label>
+              <input id="dss_income" type="number" step="1" placeholder="e.g. 45000" />
+            </div>
+            <div style="flex:1">
+              <label>Water access</label>
+              <select id="dss_water_access">
+                <option value="">(unknown)</option>
+                <option value="piped">Piped</option>
+                <option value="well">Well/Borewell</option>
+                <option value="none">None</option>
+              </select>
+              <label style="display:block;margin-top:8px">Tribal status</label>
+              <input id="dss_tribe" type="checkbox" /> <label for="dss_tribe" style="display:inline"> Scheduled Tribe</label>
+              <div style="height:6px"></div>
+              <label style="display:block;margin-top:8px">Activities</label>
+              <input id="dss_agriculture" type="checkbox" /> <label for="dss_agriculture" style="display:inline"> Agriculture</label><br/>
+              <input id="dss_labourer" type="checkbox" /> <label for="dss_labourer" style="display:inline"> Labourer</label>
+            </div>
+          </div>
+        </fieldset>
+        <div style="display:flex;gap:8px;align-items:center" class="form-full">
           <button type="submit">Find & Apply</button>
           <button id="chooseManual" type="button" class="btn-secondary">Choose different spot</button>
+          <button id="getDssBtn" type="button" class="btn-secondary">Get Recommendations</button>
           <div id="manualHint" class="small" style="margin-left:8px;color:#666"></div>
+        </div>
+        <!-- Main DSS recommendations panel (shown after Apply to Form or Get Recommendations) -->
+        <div id="dssRecommendationsMain" style="display:none;margin-top:12px;padding:12px;border-radius:8px;background:#fafafa" class="form-full">
+          <div style="font-weight:700;margin-bottom:6px">Recommended Schemes</div>
+          <div id="dssListMain" class="small"></div>
         </div>
       </form>
       <div id="status" aria-live="polite"></div>
@@ -119,6 +192,19 @@
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
   <script src="{{ url_for('static', filename='apply.js') }}"></script>
   <script>
+    // Global DSS icons and help text used by both preview and main renderers
+    const DSS_ICONS = {
+      'PM-KISAN': '🌾',
+      'Jal Jeevan Mission': '🚰',
+      'MGNREGA': '🔨',
+      'DAJGUA': '🛖'
+    };
+    const DSS_HELP = {
+      'PM-KISAN': 'Income support for small and marginal farmers. Requires farming household and small landholding.',
+      'Jal Jeevan Mission': 'Piped drinking water support for households lacking tap connections.',
+      'MGNREGA': 'Employment guarantee for rural households, particularly labourers and low-income families.',
+      'DAJGUA': 'Tribal-focused assistance and benefits for Scheduled Tribes or vulnerable tribal households.'
+    };
     // Image extraction logic: upload to server /extract_patta and fill fields
     document.getElementById('extractBtn').onclick = function() {
       const fileInput = document.getElementById('pattaFile');
@@ -182,6 +268,98 @@
           document.getElementById('previewVillage').value = previewVillage;
           document.getElementById('previewKhata').value = previewKhata;
           preview.style.display = '';
+
+          // Render DSS recommendations if present, otherwise fetch from /recommend
+          const recPanel = document.getElementById('dssRecommendations');
+          const recList = document.getElementById('dssList');
+          recList.innerHTML = '';
+          const serverRecs = data.dss_recommendations || data.fields && data.fields.dss_recommendations;
+          // Small map of icons and inline help text for known schemes
+          const DSS_ICONS = {
+            'PM-KISAN': '🌾',
+            'Jal Jeevan Mission': '🚰',
+            'MGNREGA': '🔨',
+            'DAJGUA': '🛖'
+          };
+          const DSS_HELP = {
+            'PM-KISAN': 'Income support for small and marginal farmers. Requires farming household and small landholding.',
+            'Jal Jeevan Mission': 'Piped drinking water support for households lacking tap connections.',
+            'MGNREGA': 'Employment guarantee for rural households, particularly labourers and low-income families.',
+            'DAJGUA': 'Tribal-focused assistance and benefits for Scheduled Tribes or vulnerable tribal households.'
+          };
+
+          function renderRecs(recs) {
+            // recs: array of {scheme, score, reasons}
+            window.latestDssRecs = recs || [];
+            window.selectedDssSchemes = window.selectedDssSchemes || [];
+            if (!recs || !recs.length) {
+              recPanel.style.display = 'none';
+              return;
+            }
+            recPanel.style.display = '';
+            recList.innerHTML = '';
+            const container = document.createElement('div'); container.className = 'dss-cards';
+            recs.forEach((r, idx) => {
+              const name = r.scheme || (r[0] || 'Unknown');
+              const score = (r.score !== undefined) ? r.score : (r.raw_score !== undefined ? Math.round((r.raw_score||0)) : undefined);
+              const reasons = r.reasons || r.reason || [];
+              // card
+              const card = document.createElement('div'); card.className = 'dss-card';
+              const row = document.createElement('div'); row.className = 'dss-row';
+              const icon = document.createElement('div'); icon.className = 'dss-icon'; icon.textContent = DSS_ICONS[name] || '✨';
+              row.appendChild(icon);
+              // title + checkbox
+              const titleWrap = document.createElement('div');
+              titleWrap.style.flex = '1';
+              const cb = document.createElement('input'); cb.type='checkbox'; cb.id = 'dss_cb_' + idx;
+              const defaultSelected = (score === undefined) ? true : (score >= 50);
+              cb.checked = window.selectedDssSchemes.includes(name) ? true : defaultSelected;
+              if (cb.checked && !window.selectedDssSchemes.includes(name)) window.selectedDssSchemes.push(name);
+              cb.onchange = function(){ if(this.checked){ if(!window.selectedDssSchemes.includes(name)) window.selectedDssSchemes.push(name);} else { const i = window.selectedDssSchemes.indexOf(name); if(i!==-1) window.selectedDssSchemes.splice(i,1);} };
+              const label = document.createElement('label'); label.htmlFor = cb.id; label.className='dss-title'; label.textContent = name;
+              const help = document.createElement('span'); help.className='dss-help'; help.title = DSS_HELP[name] || '';
+              help.textContent = 'ℹ️';
+              titleWrap.appendChild(cb); titleWrap.appendChild(label); titleWrap.appendChild(help);
+              row.appendChild(titleWrap);
+              const badge = document.createElement('div'); badge.className='dss-badge'; badge.textContent = (score!==undefined?score:'');
+              row.appendChild(badge);
+              card.appendChild(row);
+              if (reasons && reasons.length) { const rr = document.createElement('div'); rr.className='dss-reasons'; rr.textContent = reasons.join('; '); card.appendChild(rr); }
+              // description + learn more link (from server metadata)
+              const desc = r.description || r.desc || '';
+              const url = r.url || r.link || '';
+              if (desc) {
+                const d = document.createElement('div'); d.className = 'dss-desc'; d.textContent = desc; card.appendChild(d);
+              }
+              if (url) {
+                const a = document.createElement('a'); a.className = 'dss-learn'; a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = 'Learn more'; card.appendChild(a);
+              }
+              container.appendChild(card);
+            });
+            recList.appendChild(container);
+          }
+
+          if (serverRecs && serverRecs.length) {
+            renderRecs(serverRecs);
+          } else {
+            // fallback: call /recommend with the preview applicant
+            const applicantPayload = {
+              name: previewName || document.getElementById('previewName').value,
+              father: previewFather || document.getElementById('previewFather').value,
+              village: previewVillage || document.getElementById('previewVillage').value,
+              // include OCR metadata so DSS can make better decisions
+              patta_confidence: (data && data.patta_confidence) || (data.fields && data.fields.patta_confidence) || 0.0,
+              scanned_metadata: (data && data.scanned_metadata) || (data.fields && data.fields.scanned_metadata) || {}
+            };
+            fetch('/recommend', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(applicantPayload) })
+              .then(r => r.json())
+              .then(j => {
+                const recs = j.scored || j.dss_recommendations || j || [];
+                renderRecs(recs);
+              }).catch(() => {
+                recPanel.style.display = 'none';
+              });
+          }
         })
         .catch(err => {
           spinner.style.display = 'none';
@@ -196,9 +374,89 @@
       document.getElementById('village').value = document.getElementById('previewVillage').value.trim();
       document.getElementById('khataNo').value = document.getElementById('previewKhata').value.trim();
       document.getElementById('extractedPreview').style.display = 'none';
+      // After applying to form, also show main recommendations panel
+      buildApplicantAndShowRecommendations();
     };
     document.getElementById('dismissExtracted').onclick = function() {
       document.getElementById('extractedPreview').style.display = 'none';
+    };
+
+    // Build an applicant object from form or previews (including manual DSS inputs)
+    function buildApplicantObject() {
+      const applicant = {};
+      applicant.name = document.getElementById('applicant').value.trim() || document.getElementById('previewName').value.trim();
+      applicant.father = document.getElementById('fatherName').value.trim() || document.getElementById('previewFather').value.trim();
+      applicant.village = document.getElementById('village').value.trim() || document.getElementById('previewVillage').value.trim();
+      applicant.stateKey = document.getElementById('stateKey').value;
+      // manual DSS fields
+      const land = parseFloat(document.getElementById('dss_land_size').value || 0);
+      if (!isNaN(land) && land > 0) applicant.land_size = land;
+      const hh = parseInt(document.getElementById('dss_household_size').value || 0);
+      if (!isNaN(hh) && hh > 0) applicant.household_size = hh;
+      const income = parseFloat(document.getElementById('dss_income').value || 0);
+      if (!isNaN(income) && income >= 0) applicant.income = income;
+      const wa = document.getElementById('dss_water_access').value;
+      if (wa) applicant.water_access = wa;
+      applicant.tribe = document.getElementById('dss_tribe').checked;
+      applicant.agriculture = document.getElementById('dss_agriculture').checked;
+      applicant.labourer = document.getElementById('dss_labourer').checked;
+      // include preview OCR metadata if available
+      applicant.patta_confidence = window.latestPattaConfidence || 0.0;
+      applicant.scanned_metadata = window.latestScannedMetadata || {};
+      return applicant;
+    }
+
+    function renderMainRecs(recs) {
+      const panel = document.getElementById('dssRecommendationsMain');
+      const list = document.getElementById('dssListMain');
+      if (!recs || !recs.length) { panel.style.display = 'none'; return; }
+      panel.style.display = '';
+      list.innerHTML = '';
+      const container = document.createElement('div'); container.className='dss-cards';
+      recs.forEach(r => {
+        const name = r.scheme || r[0] || 'Unknown';
+        const score = (r.score !== undefined) ? r.score : (r.raw_score !== undefined ? Math.round(r.raw_score) : undefined);
+        const reasons = r.reasons || r.reason || [];
+        const card = document.createElement('div'); card.className='dss-card';
+        const row = document.createElement('div'); row.className='dss-row';
+        const icon = document.createElement('div'); icon.className='dss-icon'; icon.textContent = DSS_ICONS[name] || '✨';
+        row.appendChild(icon);
+        const titleWrap = document.createElement('div'); titleWrap.style.flex='1';
+        const title = document.createElement('div'); title.className='dss-title'; title.textContent = name;
+        const help = document.createElement('span'); help.className='dss-help'; help.title = DSS_HELP[name] || ''; help.textContent='ℹ️';
+        titleWrap.appendChild(title); titleWrap.appendChild(help);
+        row.appendChild(titleWrap);
+        const badge = document.createElement('div'); badge.className='dss-badge'; badge.textContent = (score!==undefined?score:''); row.appendChild(badge);
+        card.appendChild(row);
+        if (reasons && reasons.length) { const rr = document.createElement('div'); rr.className='dss-reasons'; rr.textContent = reasons.join('; '); card.appendChild(rr); }
+        // description + learn more link (from server metadata)
+        const desc = r.description || r.desc || '';
+        const url = r.url || r.link || '';
+        if (desc) { const d = document.createElement('div'); d.className = 'dss-desc'; d.textContent = desc; card.appendChild(d); }
+        if (url) { const a = document.createElement('a'); a.className = 'dss-learn'; a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = 'Learn more'; card.appendChild(a); }
+        container.appendChild(card);
+      });
+      list.appendChild(container);
+    }
+
+    function buildApplicantAndShowRecommendations() {
+      const applicant = buildApplicantObject();
+      // Store latest applicant for save flow
+      window.latestApplicantForSave = applicant;
+      // Call /recommend endpoint to get scored recs (server uses dss directly)
+      fetch('/recommend', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(applicant) })
+        .then(r => r.json())
+        .then(j => {
+          const recs = j.scored || j.dss_recommendations || j || [];
+          window.latestDssRecs = recs;
+          renderMainRecs(recs);
+        }).catch(() => {
+          renderMainRecs([]);
+        });
+    }
+
+    document.getElementById('getDssBtn').onclick = function() {
+      buildApplicantAndShowRecommendations();
     };
   </script>
   <script>
@@ -350,15 +608,20 @@
                 return;
               }
               // Save application
-              db.collection('applications').add({
-                userId: currentUser.uid,
-                applicant,
-                tribal_note,
-                village,
-                stateKey,
-                status: 'Pending',
-                submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-              }).then(() => {
+      // Determine selected schemes (prefer main panel selection)
+      const selectedSchemes = (window.selectedDssSchemes && window.selectedDssSchemes.length) ? window.selectedDssSchemes : (window.latestDssRecs || []).filter(r => (r.score||r.raw_score||0) >= 50).map(r => r.scheme || r[0]);
+      db.collection('applications').add({
+        userId: currentUser.uid,
+        applicant,
+        tribal_note,
+        village,
+        stateKey,
+        status: 'Pending',
+        // include selected DSS schemes and a snapshot of what was recommended
+        dss_selected_schemes: selectedSchemes || [],
+        dss_recommendations_snapshot: window.latestDssRecs || [],
+        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
                 successDiv.textContent = "Application submitted!";
                 loadApplication();
               }).catch(() => {

@@ -179,17 +179,40 @@
         "@geometry": "center",
         "applications": [
           {
-            "id": "app-user-1757875981914",
-            "applicant": "Mohan Kumar Bhimpur",
+            "id": "app-user-1757964041149",
+            "applicant": "Amash",
             "tribal_note": "",
             "coords": [
               77.5420514,
               21.9121236
             ],
             "status": "approved",
-            "created_at": "2025-09-14T18:53:01.914Z",
-            "admin_note": "Ok good",
-            "updated_at": "2025-09-14T18:53:20.445Z"
+            "created_at": "2025-09-15T19:20:41.149Z",
+            "admin_note": "",
+            "dss_recommendations": [
+              {
+                "scheme": "Jal Jeevan Mission",
+                "raw_score": 80.0,
+                "reasons": [
+                  "National programme to provide safe and adequate drinking water through individual household tap connections by 2024 to all rural households.",
+                  "No piped water"
+                ],
+                "description": "National programme to provide safe and adequate drinking water through individual household tap connections by 2024 to all rural households.",
+                "url": "https://jaljeevanmission.gov.in/",
+                "score": 100
+              },
+              {
+                "scheme": "MGNREGA",
+                "raw_score": 30.0,
+                "reasons": [
+                  "Mahatma Gandhi National Rural Employment Guarantee Act — guarantees 100 days of wage employment to rural households, focusing on livelihood security."
+                ],
+                "description": "Mahatma Gandhi National Rural Employment Guarantee Act — guarantees 100 days of wage employment to rural households, focusing on livelihood security.",
+                "url": "https://nrega.nic.in/",
+                "score": 0
+              }
+            ],
+            "updated_at": "2025-09-15T19:29:45.113Z"
           }
         ]
       },
@@ -1225,22 +1248,7 @@
       "properties": {
         "@id": "way/822085280",
         "landuse": "forest",
-        "@geometry": "center",
-        "applications": [
-          {
-            "id": "app-user-1757881876782",
-            "applicant": "Molesh sinh",
-            "tribal_note": "",
-            "coords": [
-              81.7025149,
-              23.2238296
-            ],
-            "status": "approved",
-            "created_at": "2025-09-14T20:31:16.782Z",
-            "admin_note": "",
-            "updated_at": "2025-09-14T20:31:34.752Z"
-          }
-        ]
+        "@geometry": "center"
       },
       "geometry": {
         "type": "Point",
@@ -1752,22 +1760,7 @@
       "properties": {
         "@id": "way/1025826858",
         "landuse": "forest",
-        "@geometry": "center",
-        "applications": [
-          {
-            "id": "app-user-1757791007001",
-            "applicant": "Amash",
-            "tribal_note": "Im getting patta",
-            "coords": [
-              74.8312636,
-              23.4842022
-            ],
-            "status": "rejected",
-            "created_at": "2025-09-13T19:16:47.001Z",
-            "admin_note": "Good to go",
-            "updated_at": "2025-09-13T19:21:58.659Z"
-          }
-        ]
+        "@geometry": "center"
       },
       "geometry": {
         "type": "Point",

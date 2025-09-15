@@ -8,6 +8,11 @@ try:
 except Exception:
     patta_ocr = None
 
+try:
+    import dss
+except Exception:
+    dss = None
+
 app = Flask(__name__)
 
 try:
@@ -87,7 +92,31 @@ def extract_patta():
             'Parsed': result.get('Parsed'),
             'Translated': result.get('Translated', {})
         }
-        return json_response({'success': True, 'fields': fields})
+        # Build applicant dict for DSS (include OCR metadata if present)
+        applicant = {
+            'name': fields.get('Name') or fields['Translated'].get('name'),
+            'father': fields.get('Father') or fields['Translated'].get('father_name'),
+            'village': fields.get('Village') or fields['Translated'].get('village'),
+            'land_size': result.get('Parsed', {}).get('land_size'),
+            'tribe': result.get('Parsed', {}).get('tribe', False),
+            'water_access': result.get('Parsed', {}).get('water_access'),
+            'income': result.get('Parsed', {}).get('income'),
+            # attach geolocation if the frontend sent it via form
+            'geolocation': {
+                'lat': request.form.get('lat'),
+                'lon': request.form.get('lon')
+            } if (request.form.get('lat') and request.form.get('lon')) else None,
+            'patta_confidence': result.get('ocr_confidence') or result.get('confidence') or 0.0,
+            'scanned_metadata': result.get('scanned_metadata', {})
+        }
+        recs = None
+        if dss is not None:
+            try:
+                recs = dss.recommend_with_priority(applicant)
+            except Exception:
+                recs = None
+
+        return json_response({'success': True, 'fields': fields, 'dss_recommendations': recs})
     finally:
         try:
             if os.path.exists(tmp_path):
@@ -164,6 +193,12 @@ def save_app():
     if found_app_index is not None:
         # Ensure village and stateKey are always present in the geojson application
         apps[found_app_index].update(updatedApp)
+        # Compute DSS recommendations for saved application (if DSS available)
+        try:
+            if dss is not None and isinstance(apps[found_app_index], dict):
+                apps[found_app_index]['dss_recommendations'] = dss.recommend_with_priority(apps[found_app_index])
+        except Exception:
+            pass
         if 'village' in updatedApp:
             apps[found_app_index]['village'] = updatedApp['village']
         if 'stateKey' in updatedApp:
@@ -174,6 +209,12 @@ def save_app():
             updatedApp['village'] = props['village']
         if 'stateKey' not in updatedApp and 'stateKey' in props:
             updatedApp['stateKey'] = props['stateKey']
+        # Compute DSS recommendations for saved application (if DSS available)
+        try:
+            if dss is not None and isinstance(updatedApp, dict):
+                updatedApp['dss_recommendations'] = dss.recommend_with_priority(updatedApp)
+        except Exception:
+            pass
         apps.append(updatedApp)
 
     try:
@@ -191,7 +232,7 @@ def save_app():
             pass
         return json_response({'success': False, 'message': 'Failed to write file: ' + str(e)}, 500)
 
-    return json_response({'success': True, 'message': 'Saved'})
+    return json_response({'success': True, 'message': 'Saved', 'application': updatedApp})
 
 @app.route("/geocode")
 def geocode():
@@ -240,6 +281,45 @@ def get_app_status():
         except Exception:
             continue
     return json_response({'success': True, 'status': 'Pending'})
+
+
+@app.route('/recommend', methods=['POST'])
+def recommend_proxy():
+    # Accept either raw applicant or wrapper {"applicant": {...}}
+    try:
+        payload = request.get_json(force=True)
+    except Exception:
+        return json_response({'error': 'invalid json'}, 400)
+    applicant = payload.get('applicant') if isinstance(payload, dict) and 'applicant' in payload else payload
+    if dss is None:
+        return json_response({'error': 'DSS module not available'}, 500)
+    try:
+        a = dss.normalize_applicant(applicant)
+        eligible = dss.recommend_schemes(a)
+        scored = dss.recommend_with_priority(a)
+        return jsonify({'applicant': a, 'eligible': eligible, 'scored': scored})
+    except Exception as e:
+        return json_response({'error': str(e)}, 500)
+
+
+@app.route('/recommend/batch', methods=['POST'])
+def recommend_batch_proxy():
+    try:
+        payload = request.get_json(force=True)
+    except Exception:
+        return json_response({'error': 'invalid json'}, 400)
+    if not isinstance(payload, list):
+        return json_response({'error': 'expected list of applicants'}, 400)
+    if dss is None:
+        return json_response({'error': 'DSS module not available'}, 500)
+    out = []
+    for raw in payload:
+        try:
+            a = dss.normalize_applicant(raw)
+            out.append({'applicant': a, 'eligible': dss.recommend_schemes(a), 'scored': dss.recommend_with_priority(a)})
+        except Exception:
+            out.append({'applicant': raw, 'error': 'rule error'})
+    return jsonify(out)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
