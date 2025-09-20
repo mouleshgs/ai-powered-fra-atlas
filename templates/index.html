@@ -51,6 +51,14 @@
         <option value="approved">Approved</option>
         <option value="rejected">Rejected</option>
       </select>
+      <!-- New asset filter dropdown -->
+      <select id="assetFilter" style="padding:8px;border-radius:6px;border:1px solid #ddd;font-size:13px">
+        <option value="all">All assets</option>
+        <option value="forest">Forest</option>
+        <option value="households">Households</option>
+        <option value="water">Water</option>
+        <option value="bareland">Bare land</option>
+      </select>
       <select id="schemeFilter" style="padding:8px;border-radius:6px;border:1px solid #ddd;font-size:13px">
         <option value="">All schemes</option>
       </select>
@@ -60,11 +68,25 @@
   </div>
 
   <div id="map"></div>
+  <!-- counts area for selected marker -->
+  <div id="assetCounts" style="position:absolute; right:12px; bottom:12px; background:rgba(255,255,255,0.95); padding:10px; border-radius:8px; border:1px solid #eee; font-size:13px; z-index:9999;">
+    <div style="font-weight:700;margin-bottom:6px">Nearby asset counts</div>
+    <div id="count_water">Water bodies: —</div>
+    <div id="count_buildings">Buildings: —</div>
+    <div id="count_forest">Forests: —</div>
+    <div id="count_bareland">Bare land: —</div>
+  </div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     const map = L.map('map').setView([22.0, 82.0], 5);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'© OpenStreetMap', maxZoom: 18 }).addTo(map);
+    // Esri World Imagery tiles for satellite basemap (reliable coverage for India)
+    const tileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
+      maxZoom: 18
+    }).addTo(map);
+    // OSM normal layer (available to toggle)
+    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 18 });
 
     const files = {
       "mp": "/static/geojson/mp.geojson",
@@ -244,6 +266,8 @@
       bareland: L.layerGroup().addTo(map)
     };
     let currentAssetCircle = null;
+    // Track last fetched counts so we can show in UI
+    const lastAssetCounts = { water:0, buildings:0, forest:0, bareland:0 };
 
     // Colors per asset category
     const assetColors = {
@@ -256,6 +280,8 @@
     function clearAssetLayers(){
       Object.values(assetLayers).forEach(g => { g.clearLayers(); if(map.hasLayer(g)) map.removeLayer(g); });
       if(currentAssetCircle){ map.removeLayer(currentAssetCircle); currentAssetCircle = null; }
+      // reset counts UI
+      updateCountsUI({ water:0, buildings:0, forest:0, bareland:0 });
     }
 
     // Build bbox around center (south,west,north,east) for Overpass
@@ -315,18 +341,77 @@
 
       // Run all queries in parallel (but be mindful of rate limits)
       const cats = Object.keys(queries);
-      await Promise.all(cats.map(async cat => {
-        const res = await overpassQuery(queries[cat]);
-        if(!res || !Array.isArray(res.elements)) return;
+      const results = await Promise.all(cats.map(cat => overpassQuery(queries[cat])));
+      // tally counts and add markers
+      cats.forEach((cat, idx) => {
+        const res = results[idx];
+        if(!res || !Array.isArray(res.elements)){
+          lastAssetCounts[cat] = 0;
+          return;
+        }
         const els = res.elements;
-        // map each element to a marker
+        lastAssetCounts[cat] = els.length;
         els.forEach(e => {
           const m = createAssetMarker(e, cat);
           if(m) assetLayers[cat].addLayer(m);
         });
-        // show the layer on map
-        assetLayers[cat].addTo(map);
-      }));
+      });
+
+      // Respect the asset filter selection: show only selected category/layers
+      applyAssetFilter();
+
+      // Update counts UI after layers are created
+      updateCountsUI(lastAssetCounts);
+    }
+
+    // Update counts displayed in the floating UI
+    function updateCountsUI(counts){
+      try{
+        document.getElementById('count_water').textContent = 'Water bodies: ' + (counts.water || 0);
+        document.getElementById('count_buildings').textContent = 'Buildings: ' + (counts.buildings || 0);
+        document.getElementById('count_forest').textContent = 'Forests: ' + (counts.forest || 0);
+        document.getElementById('count_bareland').textContent = 'Bare land: ' + (counts.bareland || 0);
+      }catch(e){ /* ignore DOM errors */ }
+    }
+
+    // Apply the selected asset filter: show/hide asset layers accordingly
+    function applyAssetFilter(){
+      const sel = document.getElementById('assetFilter');
+      const val = sel ? sel.value : 'all';
+      // helper to ensure a layer is added or removed
+      function ensureLayer(key, show){
+        const layer = assetLayers[key];
+        if(!layer) return;
+        if(show){ if(!map.hasLayer(layer)) map.addLayer(layer); }
+        else { if(map.hasLayer(layer)) map.removeLayer(layer); }
+      }
+      if(val === 'all'){
+        ensureLayer('water', true);
+        ensureLayer('buildings', true);
+        ensureLayer('forest', true);
+        ensureLayer('bareland', true);
+      } else if(val === 'forest'){
+        ensureLayer('forest', true);
+        ensureLayer('water', false);
+        ensureLayer('buildings', false);
+        ensureLayer('bareland', false);
+      } else if(val === 'households'){
+        // households mapped to buildings layer
+        ensureLayer('buildings', true);
+        ensureLayer('water', false);
+        ensureLayer('forest', false);
+        ensureLayer('bareland', false);
+      } else if(val === 'water'){
+        ensureLayer('water', true);
+        ensureLayer('buildings', false);
+        ensureLayer('forest', false);
+        ensureLayer('bareland', false);
+      } else if(val === 'bareland'){
+        ensureLayer('bareland', true);
+        ensureLayer('water', false);
+        ensureLayer('buildings', false);
+        ensureLayer('forest', false);
+      }
     }
 
     // Toggle control (reuses existing UI approach)
@@ -376,6 +461,32 @@
       return div;
     };
     assetsToggle.addTo(map);
+
+    // Base layer toggle control (Satellite / OSM)
+    const baseToggle = L.control({ position: 'topleft' });
+    baseToggle.onAdd = function () {
+      const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+      div.style.background = '#fff';
+      div.style.padding = '6px';
+      div.style.cursor = 'pointer';
+      div.title = 'Toggle base map (Satellite / OSM)';
+      div.innerHTML = 'Base';
+      div.onclick = () => {
+        try{
+          if(map.hasLayer(tileLayer)){
+            map.removeLayer(tileLayer);
+            osmLayer.addTo(map);
+            div.style.background = '#f0f0f0';
+          } else {
+            map.removeLayer(osmLayer);
+            tileLayer.addTo(map);
+            div.style.background = '#e6ffe6';
+          }
+        }catch(e){/* ignore */}
+      };
+      return div;
+    };
+    baseToggle.addTo(map);
 
     function appColor(status){
       if(status === 'pending') return '#ffd449';
@@ -604,6 +715,13 @@
     document.getElementById('schemeFilter').addEventListener('change', () => renderApplicationsLayer());
     document.getElementById('minScore').addEventListener('input', () => renderApplicationsLayer());
     document.getElementById('exportCsvBtn').addEventListener('click', exportVisibleAppsToCSV);
+    // wire asset filter dropdown to apply filter immediately
+    const assetFilterEl = document.getElementById('assetFilter');
+    if(assetFilterEl){
+      assetFilterEl.addEventListener('change', () => {
+        applyAssetFilter();
+      });
+    }
 
     // repopulate scheme filter after states loaded
     setTimeout(populateSchemeFilter, 800);
