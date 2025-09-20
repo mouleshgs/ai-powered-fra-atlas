@@ -236,6 +236,99 @@
     const appsLayerGroup = L.layerGroup().addTo(map);
     let appsVisible = true;
 
+    // Asset layers (water, forest, buildings, bareland)
+    const assetLayers = {
+      water: L.layerGroup().addTo(map),
+      forest: L.layerGroup().addTo(map),
+      buildings: L.layerGroup().addTo(map),
+      bareland: L.layerGroup().addTo(map)
+    };
+    let currentAssetCircle = null;
+
+    // Colors per asset category
+    const assetColors = {
+      water: '#1e88e5',
+      forest: '#2e7d32',
+      buildings: '#6d4c41',
+      bareland: '#f6c244'
+    };
+
+    function clearAssetLayers(){
+      Object.values(assetLayers).forEach(g => { g.clearLayers(); if(map.hasLayer(g)) map.removeLayer(g); });
+      if(currentAssetCircle){ map.removeLayer(currentAssetCircle); currentAssetCircle = null; }
+    }
+
+    // Build bbox around center (south,west,north,east) for Overpass
+    function buildBBox(lat, lon, radiusMeters){
+      const km = radiusMeters / 1000;
+      const latDelta = km / 111.0; // approx
+      const lonDelta = Math.abs(km / (111.320 * Math.cos(lat * Math.PI/180))) || (km/111.0);
+      const south = (lat - latDelta).toFixed(6);
+      const north = (lat + latDelta).toFixed(6);
+      const west = (lon - lonDelta).toFixed(6);
+      const east = (lon + lonDelta).toFixed(6);
+      return `${south},${west},${north},${east}`;
+    }
+
+    // Generic Overpass fetch helper
+    async function overpassQuery(query){
+      try{
+        const url = 'https://overpass-api.de/api/interpreter';
+        const body = 'data=' + encodeURIComponent(query);
+        const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }, body });
+        if(!resp.ok) throw new Error('Overpass status ' + resp.status);
+        return await resp.json();
+      } catch(err){
+        console.warn('Overpass error', err);
+        return null;
+      }
+    }
+
+    // Create asset marker from element (node or way/relation center)
+    function createAssetMarker(elem, category){
+      let lat = null, lon = null;
+      if(elem.type === 'node'){ lat = elem.lat; lon = elem.lon; }
+      else if(elem.center){ lat = elem.center.lat; lon = elem.center.lon; }
+      if(lat === null || lon === null) return null;
+      const marker = L.circleMarker([lat, lon], { radius:6, color:'#222', weight:0.6, fillColor: assetColors[category], fillOpacity:0.95 });
+      const tags = elem.tags || {};
+      const title = tags.name || tags.ref || (category.charAt(0).toUpperCase()+category.slice(1));
+      let info = `<strong>${escapeHtml(title)}</strong><br/><small>${escapeHtml(JSON.stringify(tags))}</small>`;
+      marker.bindPopup(info);
+      return marker;
+    }
+
+    // Fetch assets around a point (radius meters)
+    async function fetchAssetsAround(lat, lon, radiusMeters = 5000){
+      clearAssetLayers();
+      // draw circle
+      currentAssetCircle = L.circle([lat, lon], { radius: radiusMeters, color:'#888', weight:1, dashArray:'4 6', fill:false }).addTo(map);
+
+      const bbox = buildBBox(lat, lon, radiusMeters);
+      // queries use out center; include nodes, ways, relations
+      const queries = {
+        water: ` [out:json][timeout:25]; ( way["natural"="water"](${bbox}); relation["natural"="water"](${bbox}); node["natural"="water"](${bbox}); ); out center; `,
+        forest: ` [out:json][timeout:25]; ( way["landuse"="forest"](${bbox}); relation["landuse"="forest"](${bbox}); node["landuse"="forest"](${bbox}); ); out center; `,
+        buildings: ` [out:json][timeout:25]; ( way["building"](${bbox}); relation["building"](${bbox}); node["building"](${bbox}); ); out center; `,
+        bareland: ` [out:json][timeout:25]; ( way["natural"="bare_rock"](${bbox}); way["landuse"="brownfield"](${bbox}); way["landuse"="grass"](${bbox}); relation["natural"="bare_rock"](${bbox}); relation["landuse"="brownfield"](${bbox}); relation["landuse"="grass"](${bbox}); node["natural"="bare_rock"](${bbox}); node["landuse"="brownfield"](${bbox}); node["landuse"="grass"](${bbox}); ); out center; `
+      };
+
+      // Run all queries in parallel (but be mindful of rate limits)
+      const cats = Object.keys(queries);
+      await Promise.all(cats.map(async cat => {
+        const res = await overpassQuery(queries[cat]);
+        if(!res || !Array.isArray(res.elements)) return;
+        const els = res.elements;
+        // map each element to a marker
+        els.forEach(e => {
+          const m = createAssetMarker(e, cat);
+          if(m) assetLayers[cat].addLayer(m);
+        });
+        // show the layer on map
+        assetLayers[cat].addTo(map);
+      }));
+    }
+
     // Toggle control (reuses existing UI approach)
     const appsToggle = L.control({ position: 'topleft' });
     appsToggle.onAdd = function () {
@@ -258,6 +351,31 @@
       return div;
     };
     appsToggle.addTo(map);
+
+    // Asset toggle control
+    const assetsToggle = L.control({ position: 'topleft' });
+    assetsToggle.onAdd = function () {
+      const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+      div.style.background = '#fff';
+      div.style.padding = '6px';
+      div.style.cursor = 'pointer';
+      div.title = 'Toggle nearby assets';
+      div.innerHTML = 'Assets';
+      div.onclick = () => {
+        // toggle visibility
+        const anyShown = Object.values(assetLayers).some(g => map.hasLayer(g));
+        if(anyShown){
+          clearAssetLayers();
+          div.style.background = '#fff';
+        } else {
+          Object.values(assetLayers).forEach(g => g.addTo(map));
+          if(currentAssetCircle) currentAssetCircle.addTo(map);
+          div.style.background = '#e6ffe6';
+        }
+      };
+      return div;
+    };
+    assetsToggle.addTo(map);
 
     function appColor(status){
       if(status === 'pending') return '#ffd449';
@@ -392,6 +510,17 @@
               marker.closePopup();
             };
           }, 20);
+        });
+
+        // When marker is clicked (or popup opened), zoom in a bit and fetch assets around it
+        marker.on('click', async () => {
+          try{
+            const latlng = marker.getLatLng();
+            // zoom slightly and center
+            map.setView(latlng, Math.max(map.getZoom(), 13));
+            // fetch assets within 5km
+            await fetchAssetsAround(latlng.lat, latlng.lng, 5000);
+          } catch(e){ console.warn('Asset fetch failed', e); }
         });
 
         appsLayerGroup.addLayer(marker);
